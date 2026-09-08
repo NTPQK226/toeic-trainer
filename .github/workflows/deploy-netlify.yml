@@ -1,13 +1,12 @@
 name: Deploy to Netlify
 
-# Deploy tự động mỗi khi push lên nhánh main (hoặc chạy tay từ tab Actions).
-# KHÔNG dùng Netlify build pipeline → không tốn build minutes của Netlify.
-# App là static thuần → workflow chỉ upload thẳng thư mục toeic_writing_app/ lên Netlify qua CLI.
+# Automatic deploy on every push to main (or manual from Actions tab).
+# Uses netlify-cli upload (no Netlify build minutes consumed - static site).
 
 on:
   push:
     branches: [main]
-  workflow_dispatch: # cho phép bấm nút "Run workflow" để deploy thủ công
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -29,18 +28,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      # App không có package.json/dependencies, nhưng netlify-cli cần chạy qua npx.
       - name: Deploy to Netlify (production)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          npx --yes netlify-cli@17 deploy \
-            --dir=toeic_writing_app \
-            --prod \
-            --message "Deploy from GitHub Actions: ${{ github.sha }}"
+        run: npx --yes netlify-cli@17 deploy --dir=toeic_writing_app --prod
 
-      - name: Print deploy URL
-        run: echo "✅ Deployed. Site: https://toeic-trainer.netlify.app"
+      - name: Print result
+        run: echo 'Deployed to https://toeic-trainer.netlify.app'
