@@ -33,7 +33,9 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        # Publish ONLY the app folder as the site root -> no PDFs/docs exposed,
+        # site root = Part 1, /part2/ = Part 2.
         run: npx --yes netlify-cli@17 deploy --dir=toeic_writing_app --prod
 
       - name: Print result
-        run: echo 'Deployed to https://toeic-trainer.netlify.app'
+        run: echo 'Deployed to https://toeictraining.netlify.app'

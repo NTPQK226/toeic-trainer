@@ -1,127 +1,99 @@
 # Kế Hoạch Deploy — TOEIC Trainer (Free & Nhanh)
 
-**Repo:** `NTPQK226/toeic-trainer` (private) · **Kiến trúc:** static site thuần (không build step, không framework).
+**Repo:** `NTPQK226/toeic-trainer` (private)
+**Netlify project (đã có sẵn):** `toeictraining` → `https://toeictraining.netlify.app`
+**Site ID:** `734e3d40-895f-467f-ad61-10c2f2da177a`
+**Kiến trúc:** static site thuần (không build step, không framework). **Publish dir = `toeic_writing_app/`**.
 
 ---
 
-## 1. Tóm tắt chiến lược (đã chọn)
+## 1. Quan trọng — Drop folder NÀO?
 
-| Hạng mục | Lựa chọn | Vì sao |
-|---|---|---|
-| Nền tảng | **Netlify** | Free, CDN toàn cầu, custom domain, HTTPS tự động, 100 GB băng thông/tháng |
-| CI/CD | **GitHub Actions → Netlify CLI** | Push là deploy. **Không tốn build minutes của Netlify** (chỉ upload file tĩnh). Dùng GitHub Actions minutes free của repo private (2000 phút/tháng) |
-| Thời gian deploy | ~20–40 giây | App static, không cài dependency |
-| Chi phí | **$0** | Netlify free + GitHub Actions free |
-| Dữ liệu nhạy cảm | Loại khỏi repo | PDF gốc, `extracted/`, `temp_inspect/` đã nằm trong `.gitignore` |
+> ⚠️ **Chỉ drop folder `toeic_writing_app`** (chứa `index.html`, `part2/`, `images/`, `_headers`, `netlify.toml`).
+> **KHÔNG drop folder gốc `D:\GIVEAWAY BỘ 100 CÂU TOEIC...`** — folder gốc chứa PDF & tài liệu nguồn → sẽ bị **lộ trên web** và URL bị sai (`/toeic_writing_app/index.html` thay vì `/`).
 
-### Vì sao không tốn "build minutes" Netlify?
-- App **không có framework/build step** → không cần Netlify chạy pipeline build.
-- Workflow chỉ gọi `netlify-cli deploy --dir=toeic_writing_app --prod` để **upload thẳng file** lên CDN Netlify qua API.
-- Hệ quả: deploy không giới hạn lượt trong gói free (chỉ giới hạn băng thông 100 GB/tháng).
+Khi drop đúng folder `toeic_writing_app`:
+- `/` → Part 1 (code mới, 155 câu + Part switcher)
+- `/part2/` → Part 2 (50 đề email)
+- Không còn file PDF nào trên web.
 
 ---
 
-## 2. Workflow CI/CD (đã tạo sẵn)
+## 2. Cách 1 — Deploy thủ công bằng Netlify Drop (nhanh nhất)
 
-File: `.github/workflows/deploy-netlify.yml`
+1. Mở <https://app.netlify.com/drop> (đã đăng nhập team `NTPQK226's team`).
+2. Kéo thả **folder `toeic_writing_app`** vào vùng drop.
+3. Chọn **"Add to an existing project"** → chọn project **`toeictraining`** (thay vì tạo mới) để giữ nguyên domain `toeictraining.netlify.app`.
+4. Đợi vài giây → xong.
 
-```yaml
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:      # cho phép deploy thủ công từ tab Actions
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - name: Deploy to Netlify (production)
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: npx --yes netlify-cli@17 deploy --dir=toeic_writing_app --prod
-```
-
-> Workflow này **đã được commit & push** lên repo. Chỉ cần làm xong bước 3–4 bên dưới là lần push tới sẽ tự deploy.
+> Header bảo mật & cache nằm trong `toeic_writing_app/_headers` → được Netlify tự áp dụng dù drop bằng cách nào.
+> `_redirects` catch-all (`/* /index.html 200`) **đã bị xoá** vì nó phá đường dẫn `/part2/`.
 
 ---
 
-## 3. Cấu hình một lần (5 phút)
+## 3. Cách 2 — CI/CD tự động (GitHub Actions → Netlify CLI)
 
-### 3.1 Tạo site Netlify
+Workflow đã commit: `.github/workflows/deploy-netlify.yml`. Mỗi push lên `main` sẽ upload `toeic_writing_app/` lên đúng project `toeictraining`.
 
-```bash
-cd "d:\GIVEAWAY BỘ 100 CÂU TOEIC WRITING PART 1\toeic_writing_app"
-npx netlify-cli login
-npx netlify-cli sites:create --name toeic-trainer
-```
+### Cấu hình 1 lần (~3 phút)
 
-Kết quả hiện ra gồm **Site ID** (dạng `xxxxxxxx-xxxx-...`) và URL mặc định `https://toeic-trainer.netlify.app`.
-
-> Nếu chưa có Node, cài tại <https://nodejs.org> (bản LTS).
-> Không cài `netlify-cli` global — dùng `npx` là đủ.
-
-### 3.2 Tạo Personal Access Token (1 lần)
-
-1. Vào <https://app.netlify.com/user/applications#personal-access-tokens>
-2. Bấm **New access token**, đặt tên `github-actions`, copy giá trị.
-
-### 3.3 Thêm Secrets vào GitHub (Settings → Secrets and variables → Actions → New repository secret)
+1. **Tạo access token:** vào <https://app.netlify.com/user/applications#personal-access-tokens> → *New access token* (đặt tên `github-actions`) → copy.
+2. **Thêm secrets vào GitHub** (repo `NTPQK226/toeic-trainer` → Settings → Secrets and variables → Actions):
 
 | Secret | Giá trị |
 |---|---|
-| `NETLIFY_AUTH_TOKEN` | Token ở bước 3.2 |
-| `NETLIFY_SITE_ID` | Site ID ở bước 3.1 |
+| `NETLIFY_AUTH_TOKEN` | token ở bước 1 |
+| `NETLIFY_SITE_ID` | `734e3d40-895f-467f-ad61-10c2f2da177a` (đã có sẵn) |
 
-### 3.4 Push để kích hoạt
+3. **Push để kích hoạt:**
+   ```bash
+   git add -A && git commit -m "ci: trigger deploy" && git push
+   ```
+4. Vào GitHub → tab **Actions** → workflow *Deploy to Netlify* chạy xanh → site đã cập nhật.
+
+> Vì app là static thuần, workflow chỉ **upload file** (không chạy build Netlify) → **không tốn build minutes của Netlify**. Dùng GitHub Actions minutes free (2000 phút/tháng cho repo private).
+
+---
+
+## 4. Deploy thủ công bằng CLI (khi cần)
 
 ```bash
-git add -A && git commit -m "ci: trigger deploy" && git push
+cd "d:\GIVEAWAY BỘ 100 CÂU TOEIC WRITING PART 1\toeic_writing_app"
+npx netlify-cli login          # đăng nhập 1 lần
+npx netlify-cli deploy --prod --dir=. --site 734e3d40-895f-467f-ad61-10c2f2da177a
 ```
 
-Vào **Actions** của repo → workflow *Deploy to Netlify* chạy → xong mở URL site.
+---
+
+## 5. Vận hành sau deploy
+
+- **Kiểm tra nhanh:**
+  - `https://toeictraining.netlify.app/` → Part 1 mới.
+  - `https://toeictraining.netlify.app/part2/` → Part 2.
+  - Thử mở `/GIVEAWAY...pdf` → phải **404** (đã hết PDF).
+- **Rollback:** Netlify → tab *Deploys* → chọn bản cũ → *Publish deploy*.
+- **Domain riêng:** Netlify → *Domain settings* → thêm domain (SSL tự động).
+- **Staging mỗi PR (tuỳ chọn):** thêm job thứ 2 deploy không `--prod` → link preview `https://<hash>--toeictraining.netlify.app`.
 
 ---
 
-## 4. Deploy thủ công (khi cần)
-
-- **Từ GitHub:** vào tab **Actions** → *Deploy to Netlify* → **Run workflow**.
-- **Từ máy local:**
-  ```bash
-  cd toeic_writing_app
-  npx netlify-cli deploy --prod --dir=. --auth $env:NETLIFY_AUTH_TOKEN --site $env:NETLIFY_SITE_ID
-  ```
-
----
-
-## 5. Tuỳ chọn nâng cao (khuyến nghị sau khi chạy ổn)
-
-- **Domain riêng:** Netlify → *Domain settings* → thêm domain bạn sở hữu (free SSL tự động). Có thể mua domain `.com` ~$10/năm nếu muốn.
-- **Phòng thủ "staging" tự động cho mỗi PR:** thêm job thứ 2 trong workflow chạy `netlify-cli deploy` (không có `--prod`) → Netlify trả link preview dạng `https://<hash>--toeic-trainer.netlify.app`. Mặc định đã có ở dạng deploy preview nếu bạn connect GitHub qua Netlify UI.
-- **Rollback:** Netlify giữ lịch sử deploy — tab *Deploys* → chọn bản cũ → *Publish deploy*.
-
----
-
-## 6. Nếu sau này muốn đổi nền tảng (so sánh nhanh)
+## 6. Đổi nền tảng sau này (nếu muốn)
 
 | Nền tảng | CI/CD | Chi phí | Ghi chú |
 |---|---|---|---|
-| **Netlify** | GitHub Actions (đã setup) | Free | Đã có header bảo mật trong `netlify.toml` |
-| Cloudflare Pages | GitHub Actions | Free | Cực nhanh toàn cầu, không giới hạn bandwidth |
-| GitHub Pages | Actions `actions/deploy-pages` | Free | Site public dù repo private; không cần tài khoản Netlify |
-| Vercel | GitHub Actions | Free | Tốt nếu sau này thêm framework |
+| **Netlify** (đang dùng) | GitHub Actions | Free | Đã có `_headers`/`netlify.toml` |
+| Cloudflare Pages | GitHub Actions | Free | Cực nhanh toàn cầu |
+| GitHub Pages | Actions | Free | Site public dù repo private |
+| Vercel | GitHub Actions | Free | Tốt nếu thêm framework sau |
 
-> Chuyển nền tảng chỉ cần đổi workflow — source không đổi (static site).
+> Đổi nền tảng chỉ cần đổi workflow — source không đổi (static site).
 
 ---
 
-## 7. Danh sách việc cần làm còn lại
+## 7. Việc cần làm
 
-- [ ] Tạo Netlify site (bước 3.1) → lấy Site ID
-- [ ] Tạo access token (bước 3.2)
-- [ ] Thêm 2 secrets vào GitHub (bước 3.3)
-- [ ] Push 1 commit bất kỳ → xác nhận workflow chạy xanh
-- [ ] (Tuỳ chọn) Gắn domain riêng
+- [x] Dọn PDF khỏi bản deploy (chỉ drop `toeic_writing_app`)
+- [x] Xoá `_redirects` catch-all gây lỗi `/part2/`
+- [x] Thêm `_headers` (bảo mật + cache) — Drop-friendly
+- [x] Workflow CI/CD trỏ đúng Site ID `734e3d40-...`
+- [ ] **(Bạn thao tác)** Drop folder `toeic_writing_app` vào project `toeictraining` (Cách 1) — hoặc thêm 2 secrets + push để chạy CI/CD (Cách 2)

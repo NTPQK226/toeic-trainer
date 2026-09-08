@@ -44,25 +44,21 @@ toeic_writing_app/
 
 ## 🌐 Deploy & CI/CD
 
-Xem hướng dẫn đầy đủ tại **[docs/plans/deploy.md](docs/plans/deploy.md)** — gồm workflow GitHub Actions `deploy-netlify.yml` deploy tự động mỗi lần push lên nhánh `main`, **không tốn build minutes của Netlify**.
+**Project Netlify đã có sẵn:** `toeictraining` → `https://toeictraining.netlify.app` (Site ID `734e3d40-895f-467f-ad61-10c2f2da177a`). Xem hướng dẫn đầy đủ tại **[docs/plans/deploy.md](docs/plans/deploy.md)**.
 
-Tóm tắt nhanh:
+> ⚠️ **Quan trọng:** luôn deploy **folder `toeic_writing_app`** làm root. Đừng kéo thả folder gốc repo (chứa PDF/tài liệu nguồn) lên Netlify vì sẽ bị lộ file trên web.
 
-1. **Tạo site Netlify** (1 lần):
-   ```bash
-   cd toeic_writing_app
-   npx netlify-cli sites:create --name toeic-trainer
-   ```
-   Ghi lại **Site ID** hiển thị.
-2. **Lấy token:** vào <https://app.netlify.com/user/applications#personal-access-tokens> → *New access token*.
-3. **Thêm secrets vào GitHub repo** (Settings → Secrets and variables → Actions):
-   - `NETLIFY_AUTH_TOKEN` = token ở bước 2
-   - `NETLIFY_SITE_ID` = Site ID ở bước 1
-4. **Push lên `main`** → GitHub Actions tự deploy. Đường dẫn deploy mặc định: `https://toeic-trainer.netlify.app`
+**Cách 1 — Netlify Drop (nhanh):** vào <https://app.netlify.com/drop> → kéo thả folder `toeic_writing_app` → chọn *Add to an existing project* → project `toeictraining`.
 
-> Mẹo: nếu muốn site đổi tên sau khi tạo, dùng `npx netlify-cli sites:rename`.
+**Cách 2 — CI/CD (GitHub Actions, không tốn build minutes Netlify):**
+Workflow `.github/workflows/deploy-netlify.yml` đã có sẵn — mỗi push lên `main` tự upload `toeic_writing_app/` lên project `toeictraining`. Cấu hình 1 lần:
+1. Tạo token: <https://app.netlify.com/user/applications#personal-access-tokens> → *New access token*.
+2. Thêm secrets vào GitHub repo → Settings → Secrets and variables → Actions:
+   - `NETLIFY_AUTH_TOKEN` = token ở bước 1
+   - `NETLIFY_SITE_ID` = `734e3d40-895f-467f-ad61-10c2f2da177a`
+3. Push lên `main` → Actions tự deploy.
 
 ## 🔐 Lưu ý bảo mật
 
 - **Không còn API key Gemini hardcode** trong source. Mỗi người dùng tự nhập key của họ (miễn phí) qua nút **cấu hình AI**.
-- Các header bảo mật (`X-Frame-Options`, `X-Content-Type-Options`…) được thiết lập trong `netlify.toml`.
+- Header bảo mật (`X-Frame-Options`, `X-Content-Type-Options`…) được thiết lập trong `toeic_writing_app/_headers` + `netlify.toml`.
