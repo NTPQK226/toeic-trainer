@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Writing Part 1 - Luyện Thi & Chấm Điểm 100 Câu Chuẩn ETS</title>
+  <meta name="description" content="Ứng dụng luyện thi và chấm điểm TOEIC Writing Part 1 bộ 100 câu chuẩn ETS. Có chế độ thi thử đếm giờ 8 phút và chế độ chấm điểm tức thì.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="container header-inner">
+      <a href="#" class="brand-wrapper">
+        <div class="brand-icon">T1</div>
+        <div class="brand-text">
+          <h1>TOEIC WRITING PART 1</h1>
+          <span>155 Câu Thực Chiến • Bộ Cơ Bản & Bộ Đề SEC</span>
+        </div>
+      </a>
+
+      <!-- Top Bar Part Switcher -->
+      <nav class="part-switcher" aria-label="Chọn phần thi TOEIC Writing">
+        <a href="./index.html" class="part-tab active" title="Đang ở Part 1: Mô Tả Tranh">
+          <span class="part-pill">Part 1</span>
+          <span class="part-name">Mô Tả Tranh</span>
+          <span class="part-count">155 câu</span>
+        </a>
+        <a href="./part2/index.html" class="part-tab" title="Chuyển sang Part 2: Viết Email">
+          <span class="part-pill">Part 2</span>
+          <span class="part-name">Viết Email</span>
+          <span class="part-count">50 đề</span>
+        </a>
+      </nav>
+
+      <!-- Mode Switcher -->
+      <nav class="mode-switcher" aria-label="Chế độ làm bài">
+        <button id="modeFullBtn" class="mode-btn active" data-mode="full">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Thi Thử 5 Câu</span>
+        </button>
+        <button id="modePracticeBtn" class="mode-btn" data-mode="practice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Chấm Điểm Ngay</span>
+        </button>
+      </nav>
+
+      <!-- Header Action Controls -->
+      <div class="header-actions">
+        <button id="aiConfigBtn" class="btn-icon" title="Cấu hình Giám Khảo AI (Gemini LLM)" aria-label="Cấu hình AI">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg>
+        </button>
+        <button id="rubricBtn" class="btn-icon" title="Thang điểm ETS (Scoring Rubric)" aria-label="Thang điểm ETS">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        </button>
+        <button id="tipsBtn" class="btn-icon" title="Bí kíp làm bài Part 1" aria-label="Bí kíp làm bài">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path></svg>
+        </button>
+        <button id="themeToggleBtn" class="btn-icon" title="Chuyển chế độ Sáng / Tối" aria-label="Chuyển giao diện">
+          <svg id="themeToggleIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="app-main">
+    <div class="container">
+      
+      <!-- ====================================================================
+           TAB 1: FULL TEST SIMULATION (Thi thử 5 câu - 8 phút chuẩn ETS)
+           ==================================================================== -->
+      <section id="fullTestTab" class="tab-content active">
+        <!-- Test Select & Timer Bar (Single Row) -->
+        <div class="test-select-bar">
+          <div class="test-select-group">
+            <label for="testSelect" style="font-weight: 700; font-size: 0.84rem; white-space: nowrap;">Chọn đề thi:</label>
+            <select id="testSelect" class="custom-select" style="min-width: 200px;"></select>
+            <button id="startTestBtn" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.84rem; white-space: nowrap;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>Bắt Đầu Bài Thi</span>
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+            <button id="aiToggleSwitchFull" class="ai-toggle-switch" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; white-space: nowrap;" title="Bật/Tắt chế độ chấm thi bằng AI Gemini cho bài thi thử">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
+              <span>AI:</span>
+              <strong id="aiStatusTextFull" style="color: var(--text-muted);">OFF</strong>
+            </button>
+
+            <!-- Countdown Timer Widget -->
+            <div id="timerWidget" class="timer-widget" style="padding: 0.25rem 0.75rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="timerText">08:00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-Progress Workspace -->
+        <div id="testActiveWorkspace">
+          <div class="test-grid">
+            <!-- Left: Picture Viewer -->
+            <div class="image-viewer-card">
+              <div class="image-header" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span id="testQuestionBadge" style="font-weight: 700; font-size: 0.85rem;">Câu 1/5 • ID #01</span>
+                  <span id="testCategoryBadge" class="category-tag">Tranh Người</span>
+                  <span id="testSecBadge" class="sec-tag" style="display: none;">SEC</span>
+                </div>
+                <!-- Nav Buttons & 5 Question Palette integrated into Header -->
+                <div style="display: flex; align-items: center; gap: 0.25rem;">
+                  <button id="testPrevBtn" class="btn btn-outline btn-nav-icon" disabled style="width: 28px; height: 28px; min-width: 28px;" title="Câu trước (Ctrl + Left)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  </button>
+                  <div class="palette-grid" id="testPalette" style="display: flex; gap: 0.2rem;">
+                    <!-- 1, 2, 3, 4, 5 buttons -->
+                  </div>
+                  <button id="testNextBtn" class="btn btn-outline btn-nav-icon" style="width: 28px; height: 28px; min-width: 28px;" title="Câu tiếp theo (Ctrl + Right)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="image-wrapper">
+                <img id="testImage" src="" alt="Bức tranh TOEIC Writing Part 1">
+              </div>
+            </div>
+
+            <!-- Right: Prompt & Writing Input -->
+            <div class="prompt-card">
+              <div class="prompt-instruction" style="font-size: 0.84rem;">
+                <strong>Yêu cầu đề thi ETS:</strong> Viết <strong>1 câu</strong> miêu tả bức tranh dựa trên 2 từ/cụm từ cho trước.
+              </div>
+
+              <!-- Keyword Display -->
+              <div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.25rem; text-transform: uppercase;">
+                  Từ khoá bắt buộc:
+                </div>
+                <div id="testKeywordsDisplay" class="keywords-display">
+                  <!-- Dynamically populated keywords badges -->
+                </div>
+              </div>
+
+              <!-- Variant Selector (Option A / Option B) -->
+              <div id="testVariantContainer" style="display: none;">
+                <span style="font-size: 0.78rem; color: var(--text-muted);">Tuỳ chọn đề:</span>
+                <div id="testVariantToggle" class="prompt-variant-toggle"></div>
+              </div>
+
+              <!-- Writing Input -->
+              <div class="writing-input-wrapper">
+                <textarea 
+                  id="testTextarea" 
+                  class="writing-textarea" 
+                  placeholder="Gõ câu miêu tả bức tranh của bạn ở đây... (Ví dụ: The women are shopping for clothes together.)"
+                  spellcheck="false"
+                  autocomplete="off"
+                  autocorrect="off"
+                ></textarea>
+                <div class="writing-stats">
+                  <span class="stat-item">Từ: <strong id="testWordCount">0</strong></span>
+                  <span class="stat-item">Ký tự: <strong id="testCharCount">0</strong></span>
+                  <span class="stat-item">Câu: <strong id="testSentenceCount">0</strong></span>
+                  <span id="testFormatWarning" style="color: var(--danger); font-weight: 600; display: none;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Viết nhiều hơn 1 câu
+                  </span>
+                </div>
+              </div>
+
+              <!-- Test Submit Button inside Right Card -->
+              <div>
+                <button id="testSubmitBtn" class="btn btn-success" style="width: 100%; padding: 0.45rem 1rem; font-size: 0.86rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.4rem;" title="Nộp bài và chấm điểm (Ctrl + Enter)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  <span>NỘP BÀI CHẤM ĐIỂM (Ctrl + Enter)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Report View (Results after submit) -->
+        <div id="testReportView" class="report-view">
+          <div class="report-summary-card">
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">KẾT QUẢ BÀI THI THỬ TOEIC WRITING PART 1</h2>
+            <div id="reportScoreNumber" class="report-score-number">15 / 15</div>
+            <div id="reportBadge" class="score-badge score-3" style="font-size: 1.15rem; margin-bottom: 0.75rem;">
+              XUẤT SẮC - ĐẠT CHUẨN ETS CAO NHẤT
+            </div>
+            <p id="reportSummaryText" style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+              Chúc mừng bạn đã hoàn thành bài thi 5 câu! Dưới đây là phân tích chi tiết cho từng câu hỏi.
+            </p>
+            <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center;">
+              <button id="reportRetakeBtn" class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+                Làm lại đề này
+              </button>
+              <button id="reportNextTestBtn" class="btn btn-outline">
+                Đề tiếp theo
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-left: 4px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5 Questions Detailed Breakdown -->
+          <div id="reportQuestionsList" class="report-questions-list">
+            <!-- Dynamically populated 5 question results -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 2: INSTANT PRACTICE MODE (Luyện tập tự do & Chấm ngay)
+           ==================================================================== -->
+      <section id="practiceTab" class="tab-content">
+        <!-- Practice Toolbar (Single Row) -->
+        <div class="practice-toolbar">
+          <div style="display: flex; align-items: center; gap: 0.45rem; flex: 1; min-width: 0;">
+            <label for="practiceCategoryFilter" style="font-weight: 700; font-size: 0.84rem; white-space: nowrap;">Bộ đề:</label>
+            <select id="practiceCategoryFilter" class="custom-select" style="max-width: 155px;">
+              <option value="all">Tất cả 155 câu</option>
+              <option value="sec">Bộ Đề SEC (55 câu mới)</option>
+              <option value="core">Bộ 100 Câu Cơ Bản</option>
+              <option value="people">Tranh Người</option>
+              <option value="objects_scenes">Tranh Vật & Cảnh</option>
+              <option value="unanswered">Chưa làm</option>
+              <option value="score3">Đạt điểm 3/3</option>
+              <option value="retry">Cần cải thiện (0-2đ)</option>
+            </select>
+
+            <label for="practiceQuestionSelect" style="font-weight: 700; font-size: 0.84rem; white-space: nowrap;">Chọn câu:</label>
+            <select id="practiceQuestionSelect" class="custom-select" style="flex: 1; max-width: 280px; min-width: 140px;">
+              <!-- Dynamically populated list of 155 questions -->
+            </select>
+
+            <input 
+              type="text" 
+              id="practiceSearchInput" 
+              class="search-input" 
+              placeholder="Tìm từ khoá..." 
+              autocomplete="off"
+              style="max-width: 135px; padding: 0.35rem 0.6rem; font-size: 0.82rem;"
+            >
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
+            <button id="practiceRandomBtn" class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; white-space: nowrap;" title="Luyện một câu ngẫu nhiên">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              <span>Ngẫu nhiên</span>
+            </button>
+            <button id="aiToggleSwitch" class="ai-toggle-switch" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; white-space: nowrap;" title="Bật/Tắt chế độ chấm bằng AI Gemini">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
+              <span>AI:</span>
+              <strong id="aiStatusText" style="color: var(--text-muted);">OFF</strong>
+            </button>
+          </div>
+        </div>
+
+        <!-- Practice Workspace Grid -->
+        <div class="test-grid">
+          <!-- Left: Picture Viewer -->
+          <div class="image-viewer-card">
+            <div class="image-header">
+              <span id="practiceQuestionBadge" style="font-weight: 700; font-size: 0.9rem;">Câu 1 / 155</span>
+              <div>
+                <span id="practiceCategoryBadge" class="category-tag">Tranh Người</span>
+                <span id="practiceSecBadge" class="sec-tag" style="display: none;">SEC</span>
+              </div>
+            </div>
+            <div class="image-wrapper">
+              <img id="practiceImage" src="" alt="Bức tranh TOEIC Writing Part 1">
+            </div>
+          </div>
+
+          <!-- Right: Prompt, Input & Action Buttons -->
+          <div class="prompt-card">
+            <div class="prompt-instruction">
+              <strong>Yêu cầu đề bài:</strong> Viết <strong>1 câu</strong> miêu tả bức tranh sử dụng 2 từ khoá bắt buộc.
+            </div>
+
+            <!-- Keyword Display -->
+            <div>
+              <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">
+                Từ khoá bắt buộc:
+              </div>
+              <div id="practiceKeywordsDisplay" class="keywords-display">
+                <!-- Badges populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Variant Selector -->
+            <div id="practiceVariantContainer" style="display: none;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Tuỳ chọn đề:</span>
+              <div id="practiceVariantToggle" class="prompt-variant-toggle"></div>
+            </div>
+
+            <!-- Writing Textarea -->
+            <div class="writing-input-wrapper">
+              <textarea 
+                id="practiceTextarea" 
+                class="writing-textarea" 
+                placeholder="Nhập câu tiếng Anh miêu tả bức tranh... Bấm 'Kiểm Tra & Chấm Ngay' hoặc phím tắt Ctrl + Enter để xem đánh giá."
+                spellcheck="false"
+                autocomplete="off"
+                autocorrect="off"
+              ></textarea>
+              <div class="writing-stats">
+                <span class="stat-item">Từ: <strong id="practiceWordCount">0</strong></span>
+                <span class="stat-item">Ký tự: <strong id="practiceCharCount">0</strong></span>
+                <span class="stat-item">Câu: <strong id="practiceSentenceCount">0</strong></span>
+                <span id="practiceFormatWarning" style="color: var(--danger); font-weight: 600; display: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                  Viết nhiều hơn 1 câu
+                </span>
+              </div>
+            </div>
+
+            <!-- Action Buttons: All in 1 row -->
+            <div class="practice-actions-row" style="display: flex; gap: 0.35rem; align-items: center; justify-content: space-between; width: 100%; flex-wrap: nowrap;">
+              <div style="display: flex; gap: 0.35rem; align-items: center; flex: 1; min-width: 0;">
+                <button id="checkAnswerBtn" class="btn btn-primary" style="font-size: 0.82rem; padding: 0.4rem 0.65rem; white-space: nowrap;" title="Kiểm tra và chấm ngay (Ctrl + Enter)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  <span>Kiểm Tra (Ctrl+Enter)</span>
+                </button>
+                <button id="showAnswerBtn" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.4rem 0.65rem; white-space: nowrap;" title="Xem ngay câu mẫu của chuyên gia">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  <span>Xem Đáp Án</span>
+                </button>
+                <button id="clearPracticeBtn" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.4rem 0.55rem; white-space: nowrap;" title="Xoá để viết lại">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                  <span>Xoá</span>
+                </button>
+              </div>
+              <div style="display: flex; gap: 0.3rem; align-items: center; flex-shrink: 0;">
+                <button id="practicePrevBtn" class="btn btn-outline btn-nav-icon" style="width: 34px; height: 34px; min-width: 34px;" title="Lùi về câu trước (Ctrl + Left)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button id="practiceNextBtn" class="btn btn-outline btn-nav-icon" style="width: 34px; height: 34px; min-width: 34px;" title="Sang câu tiếp theo (Ctrl + Right)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Instant Feedback Box -->
+            <div id="instantFeedbackBox" class="feedback-container" style="display: none;">
+              <div class="feedback-header">
+                <div>
+                  <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Kết quả đánh giá ETS:</span>
+                  <div id="feedbackScoreBadge" class="score-badge score-3">
+                    Điểm 3/3 - Xuất Sắc (Chuẩn ETS)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Criteria Breakdown -->
+              <div class="feedback-section">
+                <div class="feedback-section-title">Chi tiết các tiêu chí:</div>
+                <ul id="feedbackCriteriaList" class="feedback-list">
+                  <!-- Items inserted by JS -->
+                </ul>
+              </div>
+
+              <!-- Sample Answer Box -->
+              <div id="feedbackSampleBox" class="sample-answer-box">
+                <strong>Câu Mẫu Chuẩn Điểm 3 Của Chuyên Gia:</strong>
+                <span id="feedbackSampleText">The women are choosing some merchandise.</span>
+              </div>
+
+              <!-- Grammar Tip Box -->
+              <div id="feedbackTipBox" class="grammar-tip-box">
+                <strong>Điểm Ngữ Pháp Cần Chú Ý:</strong>
+                <span id="feedbackTipText">Sử dụng thì Hiện Tại Tiếp Diễn để miêu tả hành động trong tranh.</span>
+              </div>
+
+              <!-- AI Native Upgrade Box -->
+              <div id="feedbackAiUpgradeBox" class="ai-upgrade-box" style="display: none;">
+                <strong>Gợi Ý Viết Lại Chuẩn Bản Xứ (Giám khảo AI):</strong>
+                <span id="feedbackAiUpgradeText"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- App Footer (Single Line) -->
+  <footer class="app-footer">
+    <div class="container">
+      <p style="margin: 0; font-size: 0.78rem;"><strong>TOEIC Writing Part 1</strong> • 155 Câu Chuẩn ETS (100 Câu Cơ Bản & 55 Câu SEC) • Hỗ trợ Giám khảo AI Gemini 2026</p>
+    </div>
+  </footer>
+
+  <!-- ====================================================================
+       MODAL 1: ETS SCORING RUBRIC (Quy chuẩn chấm điểm chuẩn ETS)
+       ==================================================================== -->
+  <div id="rubricModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+          Thang Điểm & Tiêu Chí Chấm ETS Part 1
+        </h3>
+        <button class="close-btn" data-close="rubricModal">&times;</button>
+      </div>
+      <div style="font-size: 0.92rem; line-height: 1.6; color: var(--text-main);">
+        <p style="margin-bottom: 1rem; color: var(--text-muted);">
+          Mỗi câu trong Part 1 được giám khảo ETS chấm trên thang từ <strong>0 đến 3 điểm</strong> dựa trên 2 tiêu chí cốt lõi: <em>Grammar (Ngữ pháp)</em> và <em>Relevance (Sự phù hợp với tranh & dùng từ khoá)</em>:
+        </p>
+
+        <div style="background: var(--success-light); border-left: 4px solid var(--success); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.85rem;">
+          <strong style="color: var(--success);">3 ĐIỂM (Tối đa):</strong>
+          <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
+            <li>Đúng ngữ pháp, cấu trúc câu tự nhiên, không có lỗi sai nghiêm trọng.</li>
+            <li>Sử dụng chính xác cả 2 từ khoá bắt buộc (được chia thì, biến đổi số ít/nhiều).</li>
+            <li>Miêu tả đúng trọng tâm bức tranh và viết đúng <strong>duy nhất 1 câu</strong>.</li>
+          </ul>
+        </div>
+
+        <div style="background: var(--warning-light); border-left: 4px solid var(--warning); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.85rem;">
+          <strong style="color: var(--warning);">2 ĐIỂM (Khá Tốt):</strong>
+          <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
+            <li>Sử dụng được cả 2 từ khoá nhưng mắc 1 lỗi ngữ pháp chính (chia sai thì, chủ ngữ - động từ không khớp, sai dạng từ).</li>
+            <li>HOẶC sử dụng 1 từ khoá rất xuất sắc và ngữ pháp hoàn hảo.</li>
+          </ul>
+        </div>
+
+        <div style="background: var(--danger-light); border-left: 4px solid var(--danger); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.85rem;">
+          <strong style="color: var(--danger);">1 ĐIỂM (Cần Cải Thiện):</strong>
+          <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
+            <li>Chỉ dùng được 1 từ khoá và câu còn nhiều lỗi sai ngữ pháp.</li>
+            <li>Nội dung mơ hồ, ít liên quan đến bức tranh.</li>
+          </ul>
+        </div>
+
+        <div style="background: var(--bg-main); border-left: 4px solid var(--text-muted); padding: 0.75rem 1rem; border-radius: 4px;">
+          <strong style="color: var(--text-muted);">0 ĐIỂM (Không Đạt):</strong>
+          <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
+            <li>Bỏ trống không trả lời.</li>
+            <li>Viết nhiều hơn 1 câu (vi phạm quy tắc cốt lõi của Part 1).</li>
+            <li>Không sử dụng từ khoá nào hoặc câu hoàn toàn không liên quan đến tranh.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: GRAMMAR TIPS & STRATEGIES (Bí kíp làm bài)
+       ==================================================================== -->
+  <div id="tipsModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path></svg>
+          Bí Kíp Đạt Điểm 3/3 TOEIC Writing Part 1
+        </h3>
+        <button class="close-btn" data-close="tipsModal">&times;</button>
+      </div>
+      <div style="font-size: 0.92rem; line-height: 1.6;">
+        <ol style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+          <li>
+            <strong>1. Luôn viết duy nhất 1 câu:</strong><br>
+            Bắt đầu bằng chữ in hoa và kết thúc bằng dấu chấm câu. Tuyệt đối không viết 2 câu riêng biệt. Nếu cần nối ý, dùng liên từ (<em>and, but, while, because, so</em>) hoặc mệnh đề quan hệ (<em>who, which</em>).
+          </li>
+          <li>
+            <strong>2. Tranh có Người (People):</strong><br>
+            Ưu tiên thì <strong>Hiện Tại Tiếp Diễn (S + is/are + V-ing)</strong> để miêu tả hành động đang diễn ra của người trong ảnh.
+          </li>
+          <li>
+            <strong>3. Tranh Vật & Cảnh (Objects & Scenery):</strong><br>
+            Ưu tiên <strong>Thể Bị Động (S + is/are + V3/ed hoặc has/have been + V3/ed)</strong> hoặc cấu trúc tồn tại (<em>There is/are...</em>) để miêu tả sự sắp đặt của đồ vật.
+          </li>
+          <li>
+            <strong>4. Linh hoạt biến đổi từ khoá:</strong><br>
+            ETS cho phép đổi dạng từ: chia thì (<em>shop &rarr; is shopping</em>), chuyển số nhiều (<em>woman &rarr; women</em>), dạng danh động từ.
+          </li>
+          <li>
+            <strong>5. Giữ câu ngắn gọn, rõ nghĩa:</strong><br>
+            Độ dài lý tưởng là từ 8 đến 18 từ. Không viết lan man để tránh sinh ra lỗi ngữ pháp không đáng có.
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: CONFIRM SUBMIT MODAL
+       ==================================================================== -->
+  <div id="submitModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px; text-align: center;">
+      <div style="margin-bottom: 0.75rem; color: var(--primary);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </div>
+      <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Bạn Có Chắc Chắn Muốn Nộp Bài?</h3>
+      <p id="submitWarningText" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.75rem;">
+        Bạn đã hoàn thành 5/5 câu hỏi. Bấm nộp bài để xem ngay bảng điểm và phân tích chi tiết.
+      </p>
+      <div id="submitAiNotice" style="font-size: 0.85rem; padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; background: rgba(139, 92, 246, 0.08); color: #8b5cf6; font-weight: 600;">
+        Chế độ: Giám Khảo AI Gemini đang BẬT
+      </div>
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button id="cancelSubmitBtn" class="btn btn-outline">
+          Quay lại làm tiếp
+        </button>
+        <button id="confirmSubmitBtn" class="btn btn-success">
+          Đồng Ý Nộp Bài
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 4: GEMINI AI EXAMINER CONFIGURATION
+       ==================================================================== -->
+  <div id="aiConfigModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg>
+          Cấu Hình Giám Khảo AI (Gemini LLM)
+        </h3>
+        <button class="close-btn" data-close="aiConfigModal">&times;</button>
+      </div>
+      <div style="font-size: 0.92rem; line-height: 1.6;">
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Kết nối Google Gemini AI để được <strong>chấm thi thông minh</strong>, nhận diện ngữ nghĩa câu, phân tích lỗi sai chi tiết và gợi ý cách viết chuẩn người bản xứ.
+        </p>
+
+        <div style="margin-bottom: 1rem;">
+          <label for="aiApiKeyInput" style="display: block; font-weight: 700; margin-bottom: 0.35rem;">
+            Google Gemini API Key:
+          </label>
+          <input 
+            type="password" 
+            id="aiApiKeyInput" 
+            class="writing-textarea" 
+            style="min-height: auto; height: 42px; padding: 0.5rem 0.8rem; font-family: monospace; font-size: 0.9rem;" 
+            placeholder="Dán API key của bạn (bắt đầu bằng AIzaSy... hoặc AQ...)"
+          >
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            <strong>Bảo mật riêng tư 100%:</strong> Key chỉ lưu trực tiếp trên trình duyệt của riêng bạn (LocalStorage).<br>
+            Nhận API Key hoàn toàn miễn phí tại: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color: var(--primary); font-weight: 600;">Google AI Studio</a>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label for="aiModelSelect" style="display: block; font-weight: 700; margin-bottom: 0.35rem;">
+            Mô hình AI:
+          </label>
+          <select id="aiModelSelect" class="custom-select" style="width: 100%;">
+            <option value="gemini-flash-lite-latest" selected>Gemini Flash-Lite Latest (Khuyên dùng - Nhanh 1.0s & Miễn phí)</option>
+            <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (Chuẩn ETS - 1.2s)</option>
+            <option value="gemini-3.7-flash">Gemini 3.7 Flash (Mô hình mới)</option>
+            <option value="gemini-3.6-flash">Gemini 3.6 Flash (Mô hình mới)</option>
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash (Phân tích chi tiết)</option>
+            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="saveAiConfigBtn" class="btn btn-primary" style="padding: 0.5rem 1rem;">
+              Lưu Cấu Hình
+            </button>
+            <button id="testAiConfigBtn" class="btn btn-outline" style="padding: 0.5rem 0.85rem;">
+              Kiểm Tra Kết Nối
+            </button>
+          </div>
+          <button id="clearAiConfigBtn" class="btn btn-outline" style="color: var(--danger); padding: 0.5rem 0.75rem; border-color: var(--danger-light);">
+            Xoá Key
+          </button>
+        </div>
+
+        <div id="aiTestStatus" style="margin-top: 0.85rem; font-size: 0.85rem; display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Files -->
+  <script src="toeic_data.js"></script>
+  <script src="evaluator.js"></script>
+  <script src="llm_evaluator.js"></script>
+  <script src="custom_select.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

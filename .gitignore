@@ -1,0 +1,31 @@
+# ===== Tài liệu nguồn & dữ liệu thô (không đẩy lên GitHub) =====
+# Chứa nội dung sách/đề gốc có bản quyền & file tạm
+*.pdf
+*.docx
+extracted/
+temp_inspect/
+
+# ===== Hệ điều hành =====
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ===== Trình soạn thảo / IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===== Node / Python tạm (nếu có trong tương lai) =====
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.local
+
+# ===== Netlify / build output =====
+.netlify/
+dist/
+build/
