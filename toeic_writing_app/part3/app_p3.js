@@ -775,9 +775,14 @@
     initModals();
     initAiConfig();
 
-    const data = (window.TOEIC_PART3_QUESTIONS && Array.isArray(window.TOEIC_PART3_QUESTIONS) && window.TOEIC_PART3_QUESTIONS.length)
-      ? window.TOEIC_PART3_QUESTIONS
-      : (window.TOEIC_PART3_DATA || []);
+    let data = [];
+    if (window.TOEIC_PART3_QUESTIONS && Array.isArray(window.TOEIC_PART3_QUESTIONS) && window.TOEIC_PART3_QUESTIONS.length) {
+      data = window.TOEIC_PART3_QUESTIONS;
+    } else if (window.TOEIC_PART3_DATA && Array.isArray(window.TOEIC_PART3_DATA) && window.TOEIC_PART3_DATA.length) {
+      data = window.TOEIC_PART3_DATA;
+    } else if (typeof TOEIC_PART3_DATA !== 'undefined' && Array.isArray(TOEIC_PART3_DATA)) {
+      data = TOEIC_PART3_DATA;
+    }
 
     if (data && data.length) {
       questions = data;

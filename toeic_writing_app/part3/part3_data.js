@@ -508,3 +508,12 @@ const TOEIC_PART3_DATA = [
     ]
   }
 ];
+
+if (typeof window !== 'undefined') {
+  window.TOEIC_PART3_DATA = TOEIC_PART3_DATA;
+  window.TOEIC_PART3_QUESTIONS = TOEIC_PART3_DATA;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = TOEIC_PART3_DATA;
+}
+
