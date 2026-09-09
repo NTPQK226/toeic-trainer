@@ -1530,79 +1530,103 @@ select.custom-select option, .custom-select option {
 }
 
 /* ==========================================================================
-   CUSTOM UI FEEDBACK: TOAST + CONFIRM (replaces native alert/confirm)
+   CUSTOM UI FEEDBACK: TOAST + CONFIRM (Top-Center Centered & Solid)
    ========================================================================== */
 
-/* Toast container (top-center on mobile, top-right on desktop) */
+/* Toast container (top-center of viewport, floating above all modals/headers) */
 .toast-wrap {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
-  left: auto;
-  z-index: 5000;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-width: min(360px, calc(100vw - 2rem));
+  align-items: center;
+  gap: 0.6rem;
+  max-width: min(540px, calc(100vw - 2rem));
+  width: auto;
   pointer-events: none;
 }
 
 @media (max-width: 640px) {
   .toast-wrap {
-    left: 1rem;
-    right: 1rem;
-    align-items: center;
+    top: 14px;
+    left: 12px;
+    right: 12px;
+    transform: none;
     max-width: none;
+    width: auto;
   }
-  .toast { width: 100%; }
 }
 
 .toast {
   pointer-events: auto;
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary);
-  border-radius: var(--radius-md);
-  padding: 0.7rem 0.9rem;
-  box-shadow: var(--shadow-lg);
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-main, #0f172a);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-left: 5px solid var(--primary, #2563eb);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem 1.15rem;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.25), 0 4px 10px -2px rgba(0, 0, 0, 0.1);
   font-size: 0.88rem;
+  font-weight: 600;
   line-height: 1.45;
   opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform: translateY(-16px) scale(0.96);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  user-select: none;
 }
 
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.hide { opacity: 0; transform: translateY(-8px); }
+[data-theme="dark"] .toast {
+  background: var(--bg-card, #1e293b);
+  color: var(--text-main, #f8fafc);
+  border-color: var(--border-color, #334155);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast.hide {
+  opacity: 0;
+  transform: translateY(-14px) scale(0.96);
+}
 
 .toast-icon {
   flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.4rem;
+  height: 1.4rem;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
   font-size: 0.75rem;
-  color: #fff;
-  background: var(--primary);
-  margin-top: 0.1rem;
+  color: #ffffff;
+  background: var(--primary, #2563eb);
 }
 
-.toast-msg { flex: 1; }
+.toast-msg {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
 
-.toast-success { border-left-color: var(--success); }
-.toast-success .toast-icon { background: var(--success); }
-.toast-warning { border-left-color: var(--warning); }
-.toast-warning .toast-icon { background: var(--warning); }
-.toast-error { border-left-color: var(--danger); }
-.toast-error .toast-icon { background: var(--danger); }
+.toast-success { border-left-color: #10b981; }
+.toast-success .toast-icon { background: #10b981; }
+.toast-warning { border-left-color: #f59e0b; }
+.toast-warning .toast-icon { background: #f59e0b; }
+.toast-error { border-left-color: #ef4444; }
+.toast-error .toast-icon { background: #ef4444; }
+.toast-info { border-left-color: #3b82f6; }
+.toast-info .toast-icon { background: #3b82f6; }
 
 /* Confirm dialog */
 .ui-confirm-overlay {
@@ -1610,7 +1634,7 @@ select.custom-select option, .custom-select option {
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  z-index: 6000;
+  z-index: 999999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1658,16 +1682,6 @@ select.custom-select option, .custom-select option {
 .btn-danger-soft:hover { filter: brightness(0.92); }
 
 body.ui-confirm-open { overflow: hidden; }
-
-/* App Footer */
-.app-footer {
-  flex-shrink: 0;
-  text-align: center;
-  padding: 0.35rem 0.75rem;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border-color);
-  color: var(--text-muted);
-}
 
 /* ==========================================================================
    FEEDBACK & SUPPORT WIDGET & MODAL
