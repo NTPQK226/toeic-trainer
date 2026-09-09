@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Writing Full Test - 58 Phút Chuẩn ETS (Cả 3 Phần)</title>
+  <meta name="description" content="Thi thử TOEIC Writing Full Test gồm cả 3 phần: Part 1 (Q1-5, 8 phút), Part 2 (Q6 & Q7, mỗi câu 10 phút), Part 3 (Q8, 30 phút). Tổng 58 phút chuẩn ETS.">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles_full.css">
+</head>
+<body data-part="full">
+
+  <!-- ====================================================================
+       HEADER (shared nav v2: part dropdown + Full Test CTA)
+       ==================================================================== -->
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand-wrapper">
+        <div class="brand-icon">FT</div>
+        <div class="brand-text">
+          <h1>TOEIC WRITING FULL TEST</h1>
+          <span>58 Phút Chuẩn ETS • 3 Phần (Q1 – Q8)</span>
+        </div>
+      </div>
+
+      <!-- Part Dropdown (3 parts) + Full Test CTA -->
+      <div class="nav-center">
+        <div class="part-dropdown" id="partDropdown">
+          <button type="button" class="part-dd-trigger" aria-haspopup="true" aria-expanded="false" data-dd-target="partDropdownMenu">
+            <span class="part-dd-current">
+              <span class="part-pill" style="font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:9999px;background:rgba(37,99,235,0.12);color:#2563eb;">Writing</span>
+              <span class="part-name">3 Phần</span>
+            </span>
+            <svg class="dd-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="part-dropdown-menu" id="partDropdownMenu" role="menu">
+            <a href="../index.html" class="part-dd-item" role="menuitem" title="Part 1: Photos (Questions 1–5)">
+              <span class="part-pill" style="font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:9999px;background:rgba(37,99,235,0.12);color:#2563eb;">Part 1</span>
+              <span class="part-name">Photos</span>
+              <span class="dd-check">✓</span>
+            </a>
+            <a href="../part2/index.html" class="part-dd-item" role="menuitem" title="Part 2: Email (Questions 6–7)">
+              <span class="part-pill" style="font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:9999px;background:rgba(99,102,241,0.12);color:#6366f1;">Part 2</span>
+              <span class="part-name">Email</span>
+              <span class="dd-check">✓</span>
+            </a>
+            <a href="../part3/index.html" class="part-dd-item" role="menuitem" title="Part 3: Essay (Question 8)">
+              <span class="part-pill" style="font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:9999px;background:rgba(22,163,74,0.12);color:#16a34a;">Part 3</span>
+              <span class="part-name">Essay</span>
+              <span class="dd-check">✓</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="./index.html" class="fulltest-cta active" title="Bạn đang ở chế độ Full Writing Test (58 phút)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span class="ft-label">Full Writing Test</span>
+          <span class="ft-short">Full 58'</span>
+        </a>
+      </div>
+
+      <!-- Header actions (5 buttons like other part pages) -->
+      <div class="header-actions">
+        <button id="aiConfigBtn" class="btn-icon" title="Cấu hình Giám Khảo AI (Gemini LLM)" aria-label="Cấu hình AI">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg>
+        </button>
+        <button id="rubricBtn" class="btn-icon" title="Luật thi & Thang điểm ETS Full Test" aria-label="Luật thi & Thang điểm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        </button>
+        <button id="tipsBtn" class="btn-icon" title="Hướng dẫn Full Test & luật ETS" aria-label="Hướng dẫn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path></svg>
+        </button>
+        <button id="feedbackBtn" class="btn-icon" title="Góp ý & Hỗ trợ học viên" aria-label="Góp ý & Hỗ trợ">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </button>
+        <button id="themeToggleBtn" class="btn-icon" title="Chuyển Giao Diện Sáng / Tối" aria-label="Chuyển giao diện">
+          <svg id="themeToggleIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       MAIN
+       ==================================================================== -->
+  <main class="app-main">
+    <div class="container">
+
+      <!-- ==============================================================
+           SCREEN 1: SETUP (chọn đề cho 3 part)
+           ============================================================== -->
+      <section id="setupScreen" class="screen active">
+        <div class="setup-head">
+          <h2>Thi thử TOEIC Writing — Full 58 phút</h2>
+          <p>Làm đủ <strong>3 phần (8 câu Q1–Q8)</strong> trong một lần như phòng thi thật. Khóa theo khối thời gian, chỉ mở báo cáo sau khi nộp bài.</p>
+        </div>
+
+        <div class="ets-legend" role="note">
+          <div class="lg-item"><span class="lg-dot d1"></span><b>Part 1 (Q1–5):</b> chung 8:00</div>
+          <div class="lg-item"><span class="lg-dot d2"></span><b>Part 2 (Q6):</b> 10:00 riêng</div>
+          <div class="lg-item"><span class="lg-dot d2"></span><b>Part 2 (Q7):</b> 10:00 riêng</div>
+          <div class="lg-item"><span class="lg-dot d3"></span><b>Part 3 (Q8):</b> 30:00 riêng</div>
+          <div class="lg-item"><span class="lg-clock"></span><b>Tổng:</b> 58 phút</div>
+          <div class="lock-note">Hết giờ hoặc bấm "Chuyển phần" sẽ khóa vĩnh viễn các câu trước — không quay lại được.</div>
+        </div>
+
+        <div class="setup-grid">
+          <!-- Part 1 -->
+          <div class="card part-setup-card accent-1">
+            <div class="part-setup-head">
+              <span class="ps-badge p1">Part 1</span>
+              <div class="ps-title">
+                <strong>Photos (Q1–5)</strong>
+                <span class="ps-sub">Viết 1 câu miêu tả 5 bức tranh với 2 từ khoá bắt buộc.</span>
+              </div>
+              <span class="ps-time">8 phút</span>
+            </div>
+            <div class="setup-select-row">
+              <select id="p1TestSelect" class="custom-select" style="min-width: 0; width: 100%;"></select>
+              <button id="p1RandomBtn" class="btn btn-outline btn-rand" title="Chọn ngẫu nhiên đề Part 1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              </button>
+            </div>
+            <div class="part-setup-rand-label" id="p1RandLabel"></div>
+          </div>
+
+          <!-- Part 2 -->
+          <div class="card part-setup-card accent-2">
+            <div class="part-setup-head">
+              <span class="ps-badge p2">Part 2</span>
+              <div class="ps-title">
+                <strong>Email (Q6–Q7)</strong>
+                <span class="ps-sub">Trả lời 2 email — mỗi câu 10 phút riêng, không quay lại.</span>
+              </div>
+              <span class="ps-time">10'+10'</span>
+            </div>
+            <div class="setup-select-row">
+              <select id="p2TestSelect" class="custom-select" style="min-width: 0; width: 100%;"></select>
+              <button id="p2RandomBtn" class="btn btn-outline btn-rand" title="Chọn ngẫu nhiên đề Part 2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              </button>
+            </div>
+            <div class="part-setup-rand-label" id="p2RandLabel"></div>
+          </div>
+
+          <!-- Part 3 -->
+          <div class="card part-setup-card accent-3">
+            <div class="part-setup-head">
+              <span class="ps-badge p3">Part 3</span>
+              <div class="ps-title">
+                <strong>Essay (Q8)</strong>
+                <span class="ps-sub">Viết bài luận trình bày quan điểm — tối thiểu 300 từ.</span>
+              </div>
+              <span class="ps-time">30 phút</span>
+            </div>
+            <div class="setup-select-row">
+              <select id="p3TestSelect" class="custom-select" style="min-width: 0; width: 100%;"></select>
+              <button id="p3RandomBtn" class="btn btn-outline btn-rand" title="Chọn ngẫu nhiên đề Part 3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              </button>
+            </div>
+            <div class="part-setup-rand-label" id="p3RandLabel"></div>
+          </div>
+        </div>
+
+        <div class="setup-actions">
+          <button id="randomAllBtn" class="btn btn-outline" title="Tự chọn ngẫu nhiên 1 đề cho cả 3 phần">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+            Đề Ngẫu Nhiên Toàn Bộ
+          </button>
+          <button id="startFullBtn" class="btn btn-primary" disabled>
+            Bắt Đầu Bài Thi Full (58')
+          </button>
+        </div>
+      </section>
+
+      <!-- ==============================================================
+           SCREEN 2: EXAM
+           ============================================================== -->
+      <section id="examScreen" class="screen">
+        <!-- Top bar: progress (3 part groups) + block badge + timer -->
+        <div class="exam-topbar">
+          <div class="exam-progress">
+            <span class="ep-label">Tiến độ</span>
+            <div class="ep-groups" id="examDots"></div>
+          </div>
+          <div class="exam-top-right">
+            <span class="block-badge" id="blockBadge">Part 1 • Q1–5</span>
+            <div class="timer-area">
+              <span class="timer-label" id="timerLabel">Thời gian còn lại</span>
+              <div class="timer-widget" id="timerWidget">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span id="timerText">08:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic exam body (question + answer) -->
+        <div id="examBody" class="exam-body">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ==============================================================
+           SCREEN 3: REPORT
+           ============================================================== -->
+      <section id="reportScreen" class="screen">
+        <div class="report-hero">
+          <div class="rh-head">
+            <div class="rh-left">
+              <div class="rh-label">Báo cáo kết quả Full Writing Test</div>
+              <div class="rh-raw"><span id="reportRawScore">0</span> <small>/ 28 điểm thô</small></div>
+              <div class="rh-level" id="reportLevel">—</div>
+            </div>
+            <div class="rh-right">
+              <div class="rh-est-label">Thang điểm ước tính</div>
+              <div class="rh-est"><strong id="reportEst200">—</strong><small> / 200</small></div>
+            </div>
+          </div>
+
+          <!-- Horizontal 0-200 score bar (kiểu báo cáo TOEIC) -->
+          <div class="scorebar">
+            <div class="scorebar-track">
+              <div class="scorebar-fill" id="scorebarFill" style="width:0%"></div>
+              <div class="scorebar-marker" id="scorebarMarker" style="left:0%"><span class="sb-pointer"></span></div>
+              <div class="scorebar-labels">
+                <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span>
+              </div>
+            </div>
+            <div class="scorebar-bands">
+              <span style="background:#ef4444;">Yếu</span>
+              <span style="background:#f59e0b;">TB</span>
+              <span style="background:#facc15;">Khá</span>
+              <span style="background:#10b981;">Giỏi</span>
+              <span style="background:#059669;">XS</span>
+            </div>
+          </div>
+
+          <div class="rh-grade" id="reportGradeBadge">Cách chấm: …</div>
+          <div class="rh-note">* Điểm 0–200 là ước tính tham khảo — bảng quy đổi chính thức của ETS không công bố.</div>
+        </div>
+
+        <div class="report-summary-grid">
+          <div class="card part-report-card">
+            <div class="prc-head"><span class="prc-badge p1">Part 1</span><strong>Q1–5</strong></div>
+            <div class="prc-score"><span id="reportP1Score">0</span> <small>/ 15</small></div>
+            <div class="prc-desc" id="reportP1Desc">5 câu miêu tả tranh (0–3 mỗi câu)</div>
+            <button class="prc-toggle" data-part-detail="p1">Xem chi tiết từng câu</button>
+          </div>
+          <div class="card part-report-card">
+            <div class="prc-head"><span class="prc-badge p2">Part 2</span><strong>Q6–7</strong></div>
+            <div class="prc-score"><span id="reportP2Score">0</span> <small>/ 8</small></div>
+            <div class="prc-desc" id="reportP2Desc">2 email trả lời (0–4 mỗi câu)</div>
+            <button class="prc-toggle" data-part-detail="p2">Xem chi tiết từng câu</button>
+          </div>
+          <div class="card part-report-card">
+            <div class="prc-head"><span class="prc-badge p3">Part 3</span><strong>Q8</strong></div>
+            <div class="prc-score"><span id="reportP3Score">0</span> <small>/ 5</small></div>
+            <div class="prc-desc" id="reportP3Desc">1 bài luận (0–5)</div>
+            <button class="prc-toggle" data-part-detail="p3">Xem chi tiết từng câu</button>
+          </div>
+        </div>
+
+        <div id="reportDetailP1" class="report-detail"></div>
+        <div id="reportDetailP2" class="report-detail"></div>
+        <div id="reportDetailP3" class="report-detail"></div>
+
+        <div class="report-actions">
+          <button id="reportRetakeBtn" class="btn btn-outline" title="Làm lại đúng đề vừa thi">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            Làm Lại Đề Này
+          </button>
+          <button id="reportNewBtn" class="btn btn-primary" title="Chọn 1 đề mới ngẫu nhiên cho cả 3 phần">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+            Đề Mới Ngẫu Nhiên
+          </button>
+          <button id="reportSetupBtn" class="btn btn-outline" title="Về màn hình chọn đề">Về Chọn Đề</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ====================================================================
+       MODALS
+       ==================================================================== -->
+
+  <!-- MODAL 1: Rubric / ETS rules -->
+  <div id="rubricModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+          Luật thi & Thang điểm ETS
+        </h3>
+        <button class="close-btn" data-close="rubricModal">&times;</button>
+      </div>
+      <div style="font-size:0.9rem;display:flex;flex-direction:column;gap:0.6rem;line-height:1.55;">
+        <div><b>Khối thời gian (tổng 58:00):</b>
+          <ul style="margin:0.25rem 0 0 1.2rem;">
+            <li><b>Q1–5 (Part 1):</b> chung 8:00 — bấm qua lại tự do, hết giờ/chuyển là khóa.</li>
+            <li><b>Q6 (Part 2):</b> 10:00 riêng — không quay lại sau khi chuyển.</li>
+            <li><b>Q7 (Part 2):</b> 10:00 riêng — không quay lại sau khi chuyển.</li>
+            <li><b>Q8 (Part 3):</b> 30:00 riêng — hết giờ tự nộp bài.</li>
+          </ul>
+        </div>
+        <div><b>Cách chấm (điểm thô):</b> Q1–5 mỗi câu 0–3 (tối đa 15) · Q6–7 mỗi câu 0–4 (tối đa 8) · Q8 0–5 (tối đa 5) → tổng <b>28 điểm thô</b>.</div>
+        <div><b>Thang 0–200:</b> ETS quy đổi điểm thô sang thang 0–200 (bậc 10) bằng bảng không công bố. App hiển thị mức ước tính tham khảo.</div>
+        <div><b>Giám khảo:</b> nếu bật AI Gemini, hệ thống dùng AI chấm chi tiết theo tiêu chí ETS; tắt thì dùng bộ quy tắc cục bộ.</div>
+      </div>
+      <div class="modal-actions" style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1rem;">
+        <button class="btn btn-primary" data-close="rubricModal">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Gemini AI Examiner Config (same keys/modal as part pages) -->
+  <div id="aiConfigModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg>
+          Cấu Hình Giám Khảo AI (Gemini LLM)
+        </h3>
+        <button class="close-btn" data-close="aiConfigModal">&times;</button>
+      </div>
+      <div style="font-size: 0.92rem; line-height: 1.6;">
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          Hệ thống đã <strong>tích hợp sẵn Gemini API Key miễn phí</strong> dùng chung. Dán Key cá nhân để chấm không giới hạn và không lo nghẽn lượt dùng chung.
+        </p>
+        <div style="margin-bottom: 1rem;">
+          <label for="aiApiKeyInput" style="display:block;font-weight:700;margin-bottom:0.35rem;">Google Gemini API Key:</label>
+          <input type="password" id="aiApiKeyInput" class="writing-textarea" style="min-height:auto;height:42px;padding:0.5rem 0.8rem;font-family:monospace;font-size:0.9rem;" placeholder="Dán API Key cá nhân (để trống nếu dùng Key chung mặc định)...">
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.35rem;">
+            Key lưu trực tiếp trên trình duyệt (LocalStorage). Nhận key miễn phí tại
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--primary);font-weight:600;">Google AI Studio</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 1.25rem;">
+          <label for="aiModelSelect" style="display:block;font-weight:700;margin-bottom:0.35rem;">Mô hình AI:</label>
+          <select id="aiModelSelect" class="custom-select" style="width:100%;">
+            <option value="gemini-flash-lite-latest" selected>Gemini Flash-Lite Latest (Khuyên dùng - Nhanh & Miễn phí)</option>
+            <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (Chuẩn ETS)</option>
+            <option value="gemini-3.7-flash">Gemini 3.7 Flash (Mô hình mới)</option>
+            <option value="gemini-3.6-flash">Gemini 3.6 Flash (Mô hình mới)</option>
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash (Phân tích chi tiết)</option>
+            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:0.6rem;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+          <div style="display:flex;gap:0.5rem;">
+            <button id="saveAiConfigBtn" class="btn btn-primary">Lưu Cấu Hình</button>
+            <button id="testAiConfigBtn" class="btn btn-outline">Kiểm Tra Kết Nối</button>
+          </div>
+          <button id="clearAiConfigBtn" class="btn btn-outline" style="color:var(--danger);border-color:var(--danger-light);">Xoá Key</button>
+        </div>
+        <div id="aiTestStatus" style="margin-top:0.85rem;font-size:0.85rem;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Guide / Tips -->
+  <div id="tipsModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path></svg>
+          Hướng dẫn làm Full Test
+        </h3>
+        <button class="close-btn" data-close="tipsModal">&times;</button>
+      </div>
+      <div style="font-size:0.9rem;display:flex;flex-direction:column;gap:0.55rem;line-height:1.55;">
+        <p><b>Phần 1 (Q1–5):</b> viết đúng 1 câu, dùng đủ 2 từ khoá, thì hiện tại tiếp diễn miêu tả hành động trong tranh.</p>
+        <p><b>Phần 2 (Q6–7):</b> email nên 80–120 từ, bám sát Directions (hỏi / đề xuất / giải thích...), mở đầu và kết lịch sự.</p>
+        <p><b>Phần 3 (Q8):</b> bài luận tối thiểu 300 từ, cấu trúc mở bài – thân bài – kết luận, nêu lý do kèm ví dụ cụ thể.</p>
+        <p><b>Mẹo:</b> dành 2–3 phút dàn ý ở Q8; kiểm tra chính tả / ngữ pháp trước khi chuyển phần — sau khi chuyển không quay lại được.</p>
+      </div>
+      <div class="modal-actions" style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1rem;">
+        <button class="btn btn-primary" data-close="tipsModal">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../toeic_data.js"></script>
+  <script src="../evaluator.js"></script>
+  <script src="../llm_evaluator.js"></script>
+  <script src="../part2/part2_data.js"></script>
+  <script src="../part2/evaluator_p2.js"></script>
+  <script src="../part2/llm_evaluator_p2.js"></script>
+  <script src="../part3/part3_data.js"></script>
+  <script src="../part3/evaluator_p3.js"></script>
+  <script src="../part3/llm_evaluator_p3.js"></script>
+  <script src="../custom_select.js"></script>
+  <script src="../ui_feedback.js"></script>
+  <script>
+    // Part dropdown + Full Test CTA nav behavior (touch toggle + Esc close + lock API)
+    (function () {
+      var dd = document.getElementById('partDropdown');
+      if (!dd) return;
+      var trigger = dd.querySelector('.part-dd-trigger');
+      var isOpen = false;
+      var lockNav = false;
+      function setOpen(open) {
+        isOpen = open;
+        dd.classList.toggle('open', open);
+        if (trigger) { trigger.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+      }
+      if (trigger) {
+        trigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (lockNav) return;
+          setOpen(!isOpen);
+        });
+      }
+      document.addEventListener('click', function (e) {
+        if (!dd.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+      window.PartNav = {
+        lock: function () { lockNav = true; dd.classList.add('nav-locked'); var nc = document.querySelector('.nav-center'); if (nc) nc.classList.add('nav-locked'); },
+        unlock: function () { lockNav = false; dd.classList.remove('nav-locked'); var nc = document.querySelector('.nav-center'); if (nc) nc.classList.remove('nav-locked'); setOpen(false); }
+      };
+    })();
+  </script>
+  <script src="fulltest.js"></script>
+</body>
+</html>

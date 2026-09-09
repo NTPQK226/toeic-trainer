@@ -22,21 +22,41 @@
         </div>
       </div>
 
-      <!-- Part Switcher (3 parts) -->
-      <nav class="part-switcher" aria-label="TOEIC Writing Parts">
-        <a href="../index.html" class="part-tab" title="Part 1: Photos (Questions 1–5)">
-          <span class="part-pill">Part 1</span>
-          <span class="part-name">Photos</span>
+      <!-- Top Bar Part Dropdown (3 parts) + Full Writing Test CTA -->
+      <div class="nav-center">
+        <div class="part-dropdown" id="partDropdown">
+          <button type="button" class="part-dd-trigger" aria-haspopup="true" aria-expanded="false" data-dd-target="partDropdownMenu">
+            <span class="part-dd-current">
+              <span class="part-pill">Part 3</span>
+              <span class="part-name">Essay</span>
+            </span>
+            <svg class="dd-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="part-dropdown-menu" id="partDropdownMenu" role="menu">
+            <a href="../index.html" class="part-dd-item" role="menuitem" title="Part 1: Photos (Questions 1–5)">
+              <span class="part-pill">Part 1</span>
+              <span class="part-name">Photos</span>
+              <span class="dd-check">✓</span>
+            </a>
+            <a href="../part2/index.html" class="part-dd-item" role="menuitem" title="Part 2: Email (Questions 6–7)">
+              <span class="part-pill">Part 2</span>
+              <span class="part-name">Email</span>
+              <span class="dd-check">✓</span>
+            </a>
+            <a href="./index.html" class="part-dd-item active" role="menuitem" title="Part 3: Essay (Question 8)">
+              <span class="part-pill">Part 3</span>
+              <span class="part-name">Essay</span>
+              <span class="dd-check">✓</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="../fulltest/index.html" class="fulltest-cta" title="Thi thử TOEIC Writing Full Test — cả 3 phần (58 phút chuẩn ETS)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span class="ft-label">Full Writing Test</span>
+          <span class="ft-short">Full 58'</span>
         </a>
-        <a href="../part2/index.html" class="part-tab" title="Part 2: Email (Questions 6–7)">
-          <span class="part-pill">Part 2</span>
-          <span class="part-name">Email</span>
-        </a>
-        <a href="./index.html" class="part-tab active" title="Part 3: Essay (Question 8)">
-          <span class="part-pill">Part 3</span>
-          <span class="part-name">Essay</span>
-        </a>
-      </nav>
+      </div>
 
       <!-- Mode Switcher -->
       <nav class="mode-switcher" aria-label="Chế độ làm bài">
@@ -599,5 +619,37 @@
   <script src="feedback_handler.js"></script>
   <script src="app_p3.js"></script>
   <script src="ai_assistant.js"></script>
+  <script>
+    // Part dropdown + Full Test CTA nav behavior (touch toggle + Esc close + lock API)
+    (function () {
+      var dd = document.getElementById('partDropdown');
+      if (!dd) return;
+      var trigger = dd.querySelector('.part-dd-trigger');
+      var isOpen = false;
+      var lockNav = false;
+      function setOpen(open) {
+        isOpen = open;
+        dd.classList.toggle('open', open);
+        if (trigger) { trigger.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+      }
+      if (trigger) {
+        trigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (lockNav) return;
+          setOpen(!isOpen);
+        });
+      }
+      document.addEventListener('click', function (e) {
+        if (!dd.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+      window.PartNav = {
+        lock: function () { lockNav = true; dd.classList.add('nav-locked'); if (trigger) trigger.setAttribute('aria-disabled', 'true'); },
+        unlock: function () { lockNav = false; dd.classList.remove('nav-locked'); if (trigger) trigger.removeAttribute('aria-disabled'); setOpen(false); }
+      };
+    })();
+  </script>
 </body>
 </html>

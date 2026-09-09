@@ -2038,3 +2038,236 @@ body.ui-confirm-open { overflow: hidden; }
     height: 85px;
   }
 }
+
+/* ==========================================================================
+   NAV v2: Part Dropdown (3 parts, hover/click) + Full Writing Test CTA
+   ========================================================================== */
+.nav-center {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 0 0 auto;
+}
+
+.part-dropdown {
+  position: relative;
+}
+
+.part-dd-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.3rem 0.6rem 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+.part-dd-trigger:hover {
+  color: var(--text-main);
+  border-color: var(--primary);
+  background: var(--bg-card);
+}
+.part-dd-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.dd-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+  color: var(--text-muted);
+}
+.part-dropdown.open .dd-chevron {
+  transform: rotate(180deg);
+}
+
+.part-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 230px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 220;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+.part-dropdown:hover .part-dropdown-menu,
+.part-dropdown:focus-within .part-dropdown-menu,
+.part-dropdown.open .part-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.part-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.part-dd-item:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+.part-dd-item.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.part-dd-item .dd-check {
+  margin-left: auto;
+  opacity: 0;
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 800;
+}
+.part-dd-item.active .dd-check {
+  opacity: 1;
+}
+
+/* Full Writing Test CTA */
+.fulltest-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--primary-hover, var(--primary))));
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.28);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+.fulltest-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+.fulltest-cta .ft-short {
+  display: none;
+}
+
+/* Locked nav during running exam */
+.part-dropdown.nav-locked .part-dd-trigger,
+.nav-center.nav-locked .fulltest-cta {
+  opacity: 0.55;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Desktop: allow header to wrap a bit earlier now that nav is wider */
+@media (max-width: 1240px) {
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.45rem 0.8rem;
+    row-gap: 0.45rem;
+    column-gap: 0.6rem;
+    justify-content: space-between;
+  }
+  .nav-center {
+    order: 3;
+    width: fit-content;
+    margin: 0 auto;
+    justify-content: center;
+  }
+  .mode-switcher {
+    order: 4;
+    width: fit-content;
+    margin: 0 auto;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 960px) {
+  .nav-center {
+    order: 3;
+    width: fit-content;
+    margin: 0 auto;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .mode-switcher {
+    order: 4;
+    width: fit-content;
+    margin: 0 auto;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .part-dd-trigger {
+    padding: 0.28rem 0.55rem 0.28rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  .fulltest-cta {
+    padding: 0.36rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .fulltest-cta .ft-label {
+    display: none;
+  }
+  .fulltest-cta .ft-short {
+    display: inline;
+  }
+}
+
+/* Ensure dropdown menu doesn't clip on the right edge for small viewports */
+@media (max-width: 480px) {
+  .part-dropdown-menu {
+    left: auto;
+    right: -40px;
+    min-width: 210px;
+  }
+}
+
+/* Active part item: very light tint + readable brand text (not a heavy fill) */
+.part-dd-item.active {
+  background: rgba(37, 99, 235, 0.07);
+  color: #1d4ed8;
+}
+.part-dd-item.active .dd-check {
+  color: #2563eb;
+}
+.part-dd-item.active .part-pill {
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+}
+[data-theme="dark"] .part-dd-item.active {
+  background: rgba(96, 165, 250, 0.16);
+  color: #bfdbfe;
+}
+[data-theme="dark"] .part-dd-item.active .dd-check {
+  color: #93c5fd;
+}
+[data-theme="dark"] .part-dd-item.active .part-pill {
+  background: rgba(96, 165, 250, 0.24);
+  color: #bfdbfe;
+}

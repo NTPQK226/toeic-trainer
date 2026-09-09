@@ -1,6 +1,7 @@
 /**
  * TOEIC Writing Part 2 - Application Controller
- * Handles Full Test Simulation (2 questions / 20 mins) and Instant Practice Mode.
+ * Handles Full Test Simulation (2 questions: Q6 & Q7, ETS mỗi câu 10 phút riêng biệt)
+ * and Instant Practice Mode.
  */
 
 (function () {
@@ -46,11 +47,17 @@
   let currentMode = 'full'; // 'full' | 'practice'
 
   // Full Test Mode State
-  let testCurrentIndex = 0; // 0 to 24 (Tests 1 to 25)
+  let testCurrentIndex = 0; // 0 to 14 (Tests 1 to 15)
   let testQuestions = []; // 2 questions for current test
   let testActiveQIndex = 0; // 0 to 1 within current test
   let testAnswers = {}; // { [qId]: string }
-  let testTimerSeconds = 20 * 60; // 1200 seconds (20 minutes)
+  // ETS-authentic: Q6 and Q7 EACH get their own independent 10:00 countdown.
+  // Only the ACTIVE question's clock ticks; switching pauses one and resumes the other.
+  // When the active Q6 clock hits 0 → Q6 is locked (answers frozen) and app forces to Q7.
+  // When the active Q7 clock hits 0 → auto-submit. Free toggling stays (relaxed for practice).
+  const TEST_Q_SECONDS = 10 * 60; // 600 seconds (10 minutes) per question
+  let testTimers = [TEST_Q_SECONDS, TEST_Q_SECONDS]; // remaining per qIndex (0=Q6, 1=Q7)
+  let testLocks = [false, false]; // true once that question's own clock has expired
   let testTimerInterval = null;
   let testIsRunning = false;
   let testIsSubmitted = false;
@@ -98,6 +105,7 @@
     startTestBtn: document.getElementById('startTestBtn'),
     timerWidget: document.getElementById('timerWidget'),
     timerText: document.getElementById('timerText'),
+    testTimerCaption: document.getElementById('testTimerCaption'),
     aiToggleSwitchFull: document.getElementById('aiToggleSwitchFull'),
     aiStatusTextFull: document.getElementById('aiStatusTextFull'),
     testActiveWorkspace: document.getElementById('testActiveWorkspace'),
@@ -497,24 +505,21 @@
     testAnswers = {};
     testIsSubmitted = false;
 
-    // Reset Timer: 20 minutes
+    // Reset timers: each question gets its own 10 minutes (ETS)
     clearInterval(testTimerInterval);
-    testTimerSeconds = 20 * 60;
+    testTimers = [TEST_Q_SECONDS, TEST_Q_SECONDS];
+    testLocks = [false, false];
     testIsRunning = true;
     updateTimerDisplay();
 
     testTimerInterval = setInterval(() => {
-      if (testTimerSeconds > 0) {
-        testTimerSeconds--;
-        updateTimerDisplay();
-      } else {
-        clearInterval(testTimerInterval);
-        if (window.ToeicUi) {
-          window.ToeicUi.toast('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.', 'warning');
-        } else {
-          alert('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.');
-        }
-        finalizeSubmitTest();
+      if (!testIsRunning) return;
+      // Only the ACTIVE question's clock ticks down
+      testTimers[testActiveQIndex]--;
+      updateTimerDisplay();
+      if (testTimers[testActiveQIndex] <= 0) {
+        testTimers[testActiveQIndex] = 0;
+        handleTestQuestionTimeout();
       }
     }, 1000);
 
@@ -528,15 +533,72 @@
     renderTestQuestion();
   }
 
+  // Called when the ACTIVE question's own 10:00 runs out.
+  function handleTestQuestionTimeout() {
+    const idx = testActiveQIndex;
+    testLocks[idx] = true;
+    testAnswers[testQuestions[idx].id] = el.testTextarea ? el.testTextarea.value : (testAnswers[testQuestions[idx].id] || '');
+    if (idx === 0) {
+      // Q6 finished → lock Q6, move to Q7 (Q7 keeps its own remaining clock)
+      if (testLocks[1]) {
+        // Q7 had already run out earlier — whole test done
+        clearInterval(testTimerInterval);
+        testTimerInterval = null;
+        if (window.ToeicUi) {
+          window.ToeicUi.toast('Cả 2 câu đã hết giờ! Hệ thống tự động thu bài và chấm điểm.', 'warning');
+        } else {
+          alert('Cả 2 câu đã hết giờ! Hệ thống tự động thu bài và chấm điểm.');
+        }
+        finalizeSubmitTest();
+        return;
+      }
+      if (window.ToeicUi) {
+        window.ToeicUi.toast('Hết 10 phút câu 6! Câu 6 đã bị khóa. Chuyển sang câu 7.', 'warning');
+      } else {
+        alert('Hết 10 phút câu 6! Câu 6 đã bị khóa. Chuyển sang câu 7.');
+      }
+      testActiveQIndex = 1;
+      renderTestPalette();
+      renderTestQuestion();
+    } else {
+      // Q7 finished → auto submit the whole test
+      clearInterval(testTimerInterval);
+      testTimerInterval = null;
+      if (window.ToeicUi) {
+        window.ToeicUi.toast('Hết 10 phút câu 7! Hệ thống tự động thu bài và chấm điểm.', 'warning');
+      } else {
+        alert('Hết 10 phút câu 7! Hệ thống tự động thu bài và chấm điểm.');
+      }
+      finalizeSubmitTest();
+    }
+  }
+
   function updateTimerDisplay() {
     if(!el.timerText) return;
-    el.timerText.textContent = formatTime(testTimerSeconds);
+    const active = testTimers[testActiveQIndex] >= 0 ? testTimers[testActiveQIndex] : 0;
+    el.timerText.textContent = formatTime(active);
     if(el.timerWidget) el.timerWidget.classList.remove('warning', 'danger');
 
-    if (testTimerSeconds <= 60) {
+    if (active <= 60) {
       if(el.timerWidget) el.timerWidget.classList.add('danger');
-    } else if (testTimerSeconds <= 120) {
+    } else if (active <= 120) {
       if(el.timerWidget) el.timerWidget.classList.add('warning');
+    }
+
+    // Per-question chips: Q6 & Q7 each show own remaining time (ETS 10'+10')
+    if (el.testTimerCaption) {
+      if (testQuestions && testQuestions.length >= 2 && testIsRunning) {
+        el.testTimerCaption.style.display = 'inline-flex';
+        el.testTimerCaption.innerHTML = '';
+        testQuestions.forEach((q, idx) => {
+          const chip = document.createElement('span');
+          chip.className = 'tt-q' + (idx === testActiveQIndex ? ' active' : '') + (testLocks[idx] ? ' locked' : '');
+          chip.textContent = (idx === 0 ? 'Q6' : 'Q7') + ' ' + formatTime(testTimers[idx] || 0) + (testLocks[idx] ? ' 🔒' : '');
+          el.testTimerCaption.appendChild(chip);
+        });
+      } else {
+        el.testTimerCaption.style.display = 'none';
+      }
     }
   }
 
@@ -548,17 +610,27 @@
       btn.className = 'palette-btn';
       const qNum = idx === 0 ? 'Q6' : 'Q7';
       btn.textContent = qNum;
-      btn.title = `Question ${idx + 6}`;
+      btn.title = `Question ${idx + 6} • còn ${formatTime(testTimers[idx] || 0)}`;
 
+      const isLocked = !!testLocks[idx];
       const ans = testAnswers[q.id];
       if (ans && ans.trim().length > 0) {
         btn.classList.add('answered');
+      }
+      if (isLocked) {
+        btn.classList.add('locked');
+        btn.disabled = true;
       }
       if (idx === testActiveQIndex) {
         btn.classList.add('current');
       }
 
       btn.addEventListener('click', () => {
+        if (testLocks[idx]) {
+          if (window.ToeicUi) window.ToeicUi.toast('Câu này đã hết giờ và bị khóa.', 'warning');
+          return;
+        }
+        if (idx === testActiveQIndex) return;
         saveCurrentTestAnswer();
         testActiveQIndex = idx;
         renderTestPalette();
@@ -609,13 +681,28 @@
     }
     updateTestWritingStats();
 
-    // Prev / Next button states
+    // Prev / Next button states (respect per-question locks)
     if(el.testPrevBtn) {
-      el.testPrevBtn.disabled = (testActiveQIndex === 0);
+      const target = testActiveQIndex - 1;
+      el.testPrevBtn.disabled = !(target >= 0 && !testLocks[target]);
     }
     if(el.testNextBtn) {
-      el.testNextBtn.disabled = (testActiveQIndex === testQuestions.length - 1);
+      const target = testActiveQIndex + 1;
+      el.testNextBtn.disabled = !(target < testQuestions.length && !testLocks[target]);
     }
+  }
+
+  // Navigate to a question index, refusing to enter a locked question.
+  function navigateTestTo(targetIdx) {
+    if (targetIdx < 0 || targetIdx >= testQuestions.length) return;
+    if (testLocks[targetIdx]) {
+      if (window.ToeicUi) window.ToeicUi.toast('Câu này đã hết giờ và bị khóa.', 'warning');
+      return;
+    }
+    saveCurrentTestAnswer();
+    testActiveQIndex = targetIdx;
+    renderTestPalette();
+    renderTestQuestion();
   }
 
   function saveCurrentTestAnswer() {
@@ -1124,17 +1211,11 @@
     });
     
     if(el.testPrevBtn) el.testPrevBtn.addEventListener('click', () => {
-      saveCurrentTestAnswer();
-      if (testActiveQIndex > 0) testActiveQIndex--;
-      renderTestPalette();
-      renderTestQuestion();
+      navigateTestTo(testActiveQIndex - 1);
     });
     
     if(el.testNextBtn) el.testNextBtn.addEventListener('click', () => {
-      saveCurrentTestAnswer();
-      if (testActiveQIndex < testQuestions.length - 1) testActiveQIndex++;
-      renderTestPalette();
-      renderTestQuestion();
+      navigateTestTo(testActiveQIndex + 1);
     });
 
     if(el.testTextarea) {
@@ -1241,20 +1322,13 @@
 
     // --- Global Keyboard Shortcuts ---
     document.addEventListener('keydown', (e) => {
-      // Ctrl + Enter: Check answer in practice or advance/submit in test
+      // Ctrl + Enter: Check answer in practice or submit in test
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         if (currentMode === 'practice') {
           handleCheckAnswer();
         } else if (currentMode === 'full' && testIsRunning) {
-          if (testActiveQIndex === 0) {
-            saveCurrentTestAnswer();
-            testActiveQIndex = 1;
-            renderTestPalette();
-            renderTestQuestion();
-          } else {
-            promptSubmitTest();
-          }
+          promptSubmitTest();
         }
         return;
       }
@@ -1264,11 +1338,8 @@
         e.preventDefault();
         if (currentMode === 'practice' && el.practicePrevBtn && !el.practicePrevBtn.disabled) {
           el.practicePrevBtn.click();
-        } else if (currentMode === 'full' && testIsRunning && testActiveQIndex > 0) {
-          saveCurrentTestAnswer();
-          testActiveQIndex--;
-          renderTestPalette();
-          renderTestQuestion();
+        } else if (currentMode === 'full' && testIsRunning) {
+          navigateTestTo(testActiveQIndex - 1);
         }
         return;
       }
@@ -1278,11 +1349,8 @@
         e.preventDefault();
         if (currentMode === 'practice' && el.practiceNextBtn && !el.practiceNextBtn.disabled) {
           el.practiceNextBtn.click();
-        } else if (currentMode === 'full' && testIsRunning && testActiveQIndex < testQuestions.length - 1) {
-          saveCurrentTestAnswer();
-          testActiveQIndex++;
-          renderTestPalette();
-          renderTestQuestion();
+        } else if (currentMode === 'full' && testIsRunning) {
+          navigateTestTo(testActiveQIndex + 1);
         }
         return;
       }

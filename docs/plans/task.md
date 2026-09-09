@@ -7,3 +7,4 @@
 | 3 | Chuẩn hóa hệ thống icon SVG vector & text (loại bỏ 100% emoji) | Đã hoàn thành | Đã thay thế toàn bộ emoji bằng SVG Lucide và text chuyên nghiệp |
 | 4 | Nâng cấp `app.js` & `index.html` hỗ trợ Bộ Đề SEC (optgroup, note SEC, lọc bộ đề) | Đã hoàn thành | Đề SEC 01 - Đề SEC 11, badge SEC, optgroup, lọc SEC trong Luyện tập |
 | 5 | Kiểm thử tự động & xác minh toàn diện | Đã hoàn thành | Đã kiểm thử cú pháp JS, kiểm tra 155 câu hỏi, ảnh và engine chấm điểm |
+| 6 | Full Writing Test 58' (3 part, ETS 8/10/10/30) + Nav dropdown + P2 sửa mỗi câu 10' | Đã hoàn thành | Chi tiết: `docs/plans/2026-09-10-fulltest-58min-nav-p2fix.md` — đã verify trình duyệt toàn bộ luồng |
