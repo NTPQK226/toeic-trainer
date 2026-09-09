@@ -401,11 +401,47 @@
       if(el.modePracticeBtn) el.modePracticeBtn.classList.remove('active');
       if(el.fullTestTab) el.fullTestTab.classList.add('active');
       if(el.practiceTab) el.practiceTab.classList.remove('active');
+
+      // Sync from Practice to Test: Keep the active question
+      if (typeof practiceActiveIndex === 'number' && practiceActiveIndex >= 0 && practiceActiveIndex < questions.length) {
+        const targetTestIdx = Math.floor(practiceActiveIndex / 2);
+        const targetQIdx = practiceActiveIndex % 2;
+        if (el.testSelect) el.testSelect.value = targetTestIdx;
+        if (!testIsRunning || testCurrentIndex !== targetTestIdx) {
+          startTest(targetTestIdx);
+          testActiveQIndex = targetQIdx;
+          renderTestPalette();
+          renderTestQuestion();
+        } else {
+          testActiveQIndex = targetQIdx;
+          renderTestPalette();
+          renderTestQuestion();
+        }
+      }
     } else {
       if(el.modeFullBtn) el.modeFullBtn.classList.remove('active');
       if(el.modePracticeBtn) el.modePracticeBtn.classList.add('active');
       if(el.fullTestTab) el.fullTestTab.classList.remove('active');
       if(el.practiceTab) el.practiceTab.classList.add('active');
+
+      // Sync from Test to Practice: Keep the active question
+      if (typeof testCurrentIndex === 'number') {
+        const calculatedIdx = testCurrentIndex * 2 + (testActiveQIndex || 0);
+        if (calculatedIdx >= 0 && calculatedIdx < questions.length) {
+          practiceActiveIndex = calculatedIdx;
+        }
+      }
+
+      // Ensure question is visible in practice filter
+      if (el.practiceCategoryFilter && el.practiceCategoryFilter.value !== 'all') {
+        const curQ = questions[practiceActiveIndex];
+        if (curQ && curQ.category !== el.practiceCategoryFilter.value) {
+          el.practiceCategoryFilter.value = 'all';
+          filteredIndices = questions.map((_, i) => i);
+          populateQuestionSelect();
+        }
+      }
+      if (el.practiceQuestionSelect) el.practiceQuestionSelect.value = practiceActiveIndex;
       renderPracticeView();
     }
   }

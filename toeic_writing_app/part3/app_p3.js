@@ -294,11 +294,39 @@
       el.modePracticeBtn.classList.remove('active');
       el.fullTestTab.classList.add('active');
       el.practiceTab.classList.remove('active');
+
+      // Keep active question when switching from Practice to Test
+      if (typeof practiceActiveIndex === 'number' && practiceActiveIndex >= 0 && practiceActiveIndex < questions.length) {
+        if (el.testSelect) el.testSelect.value = practiceActiveIndex;
+        if (!testIsRunning || (testQuestion && questions.indexOf(testQuestion) !== practiceActiveIndex)) {
+          startTest(practiceActiveIndex);
+        }
+      }
     } else {
       el.modePracticeBtn.classList.add('active');
       el.modeFullBtn.classList.remove('active');
       el.practiceTab.classList.add('active');
       el.fullTestTab.classList.remove('active');
+
+      // Keep active question when switching from Test to Practice
+      if (testQuestion) {
+        const tIdx = questions.indexOf(testQuestion);
+        if (tIdx >= 0) practiceActiveIndex = tIdx;
+      } else if (el.testSelect) {
+        const sIdx = parseInt(el.testSelect.value, 10);
+        if (!isNaN(sIdx) && sIdx >= 0 && sIdx < questions.length) practiceActiveIndex = sIdx;
+      }
+
+      // Ensure question is visible in practice filter
+      if (el.practiceCategoryFilter && el.practiceCategoryFilter.value !== 'all') {
+        const curQ = questions[practiceActiveIndex];
+        if (curQ && curQ.category !== el.practiceCategoryFilter.value) {
+          el.practiceCategoryFilter.value = 'all';
+          filteredIndices = questions.map((_, i) => i);
+          populateQuestionSelect();
+        }
+      }
+      if (el.practiceQuestionSelect) el.practiceQuestionSelect.value = practiceActiveIndex;
       renderPracticeView();
     }
   }
