@@ -106,18 +106,92 @@ const TOEIC_PART2_DATA = [
   },
   {
     "id": "P2_04",
-    "category": "service",
-    "category_vi": "Dịch vụ",
+    "category": "schedule",
+    "category_vi": "Lịch hẹn & Phỏng vấn",
     "difficulty": "medium",
     "email": {
-      "from": "Passageways Travel",
-      "to": "Valued Customer",
-      "subject": "Travel package inquiry",
-      "date": "August 20, 1:45 P.M.",
-      "body": "Dear Customer,\n\nThank you for choosing Passageways Travel for your upcoming vacation. We have received your inquiry about our European holiday tour package.\n\nPlease let us know if you need additional details or wish to customize your itinerary.\n\nWarm regards,\nPassageways Travel Team"
+      "from": "Ken Smith",
+      "to": "Aaron Devlin, President, First Insurance Agency",
+      "subject": "Interview",
+      "date": "March 29, 8:16 A.M.",
+      "body": "Dear Mr. Devlin,\n\nI have a job interview scheduled for next Monday at 3:00 P.M. However, I am afraid there have been some changes in my current schedule, so I have to work until late at night that day. Could you possibly reschedule my interview date? I look forward to meeting you soon.\n\nBest regards,\nKen Smith"
+    },
+    "directions": "Respond to the e-mail as if you are Aaron Devlin. In your e-mail, suggest TWO possible times for holding the interview and request ONE item that Ken Smith should bring with him.",
+    "directions_vi": "Viết email trả lời như thể bạn là Aaron Devlin. Trong email của bạn, hãy đề xuất HAI khoảng thời gian có thể tổ chức phỏng vấn và yêu cầu MỘT vật dụng mà Ken Smith nên mang theo.",
+    "tasks": [
+      {
+        "type": "make_suggestion",
+        "count": 2
+      },
+      {
+        "type": "make_request",
+        "count": 1
+      }
+    ],
+    "total_tasks": 3,
+    "sample_answer": "Dear Mr. Smith,\n\nThank you for your email. I understand your situation, and I am happy to reschedule your interview.\n\nI would like to propose two alternative times for our meeting next week. You can come either on Wednesday at 10:00 A.M. or on Thursday at 2:00 P.M.\n\nAdditionally, please remember to bring a copy of your resume when you come to the office.\n\nI look forward to meeting you soon.\n\nBest regards,\nAaron Devlin\nPresident, First Insurance Agency",
+    "key_phrases": [
+      "Thank you for your email",
+      "I am happy to reschedule your interview",
+      "I would like to propose two alternative times",
+      "You can come either on Wednesday or on Thursday",
+      "Please remember to bring a copy of your resume",
+      "I look forward to meeting you soon"
+    ],
+    "set": "sec",
+    "sec_id": 4
+  },
+  {
+    "id": "P2_05",
+    "category": "event",
+    "category_vi": "Sự kiện & Tiệc",
+    "difficulty": "medium",
+    "email": {
+      "from": "Randy Emerick, Assistant to Vice-President",
+      "to": "All staff",
+      "subject": "Vice-president's retirement party",
+      "date": "January 27, 1:15 P.M.",
+      "body": "Vice-President Jerry Silveria’s retirement party will take place at the Grand Traverse Resort on February 9 at 7:00 P.M. We are asking that employees help with preparations for the party, such as decorations, setting up tables, and so on."
+    },
+    "directions": "Respond to the e-mail as if you are an employee at this company. In your e-mail, ask TWO questions and make ONE suggestion about organizing the party.",
+    "directions_vi": "Viết email trả lời như thể bạn là một nhân viên tại công ty này. Trong email, hãy hỏi HAI câu hỏi và đưa ra MỘT đề xuất về việc tổ chức bữa tiệc.",
+    "tasks": [
+      {
+        "type": "ask_question",
+        "count": 2
+      },
+      {
+        "type": "make_suggestion",
+        "count": 1
+      }
+    ],
+    "total_tasks": 3,
+    "sample_answer": "Dear Mr. Emerick,\n\nThank you for your email. I would be happy to help with the preparations for Vice-President Jerry Silveria’s retirement party.\n\nRegarding the preparations, I have two questions. What time should the volunteers arrive at the resort? Also, do we need to bring our own decoration materials?\n\nAdditionally, I suggest buying a retirement cake for the party to make it more special.\n\nPlease let me know if you need anything else.\n\nBest regards,\n[Your Name]",
+    "key_phrases": [
+      "Thank you for your email",
+      "I would be happy to help with the preparations",
+      "What time should the volunteers arrive",
+      "Do we need to bring our own decoration materials",
+      "I suggest buying a retirement cake for the party",
+      "Please let me know if you need anything else"
+    ],
+    "set": "sec",
+    "sec_id": 5
+  },
+  {
+    "id": "P2_06",
+    "category": "inquiry",
+    "category_vi": "Du lịch & Dịch vụ",
+    "difficulty": "medium",
+    "email": {
+      "from": "Cameron Contos, Passageways Travel Company",
+      "to": "Customer list",
+      "subject": "A great vacation package",
+      "date": "December 22, 9:23 A.M.",
+      "body": "Dear Passageways customers,\n\nYou are our valued clients and we want to share a great travel package with you. We are offering an unbelievable, once in a lifetime opportunity for you to explore the Galapagos Islands. The first 200 customers who respond to this advertisement will receive a 10% discount on their hotel fares."
     },
     "directions": "Respond to the e-mail as if you are a Passageways Travel customer. In your e-mail, ask TWO questions and make ONE request regarding the travel package.",
-    "directions_vi": "Viết email trả lời như thể bạn là khách hàng của Passageways Travel. Trong email, hãy hỏi HAI câu hỏi và đưa ra MỘT yêu cầu về gói du lịch.",
+    "directions_vi": "Viết email trả lời như thể bạn là khách hàng của Passageways Travel. Trong email, hãy hỏi HAI câu hỏi và đưa ra MỘT yêu cầu liên quan đến gói du lịch.",
     "tasks": [
       {
         "type": "ask_question",
@@ -129,30 +203,32 @@ const TOEIC_PART2_DATA = [
       }
     ],
     "total_tasks": 3,
-    "sample_answer": "Dear Passageways Travel Team,\n\nThank you for contacting me regarding the European holiday tour package. I am looking forward to this trip.\n\nI have two questions concerning the itinerary. First, are meals and local sightseeing transportation included in the overall price? Second, what is your cancellation and refund policy in case of unexpected schedule changes? Additionally, I would like to request a hotel room with two queen beds and a city view for our stay in Paris.\n\nThank you for your assistance, and I look forward to your reply.\n\nBest regards,\n[Your Name]",
+    "sample_answer": "Dear Mr. Contos,\n\nThank you for your email about the Galapagos Islands vacation package. I am very interested in this travel opportunity.\n\nRegarding the package, I have two questions. How much does the tour cost per person? Also, what dates is this travel package available?\n\nAdditionally, please send me a detailed itinerary of the trip so I can review the daily activities.\n\nI look forward to hearing from you soon.\n\nBest regards,\n[Your Name]",
     "key_phrases": [
-      "Thank you for contacting me regarding",
-      "Are meals and local sightseeing transportation included",
-      "What is your cancellation and refund policy",
-      "I would like to request a hotel room"
+      "Thank you for your email about the vacation package",
+      "I am very interested in this travel opportunity",
+      "How much does the tour cost per person",
+      "What dates is this travel package available",
+      "Please send me a detailed itinerary of the trip",
+      "I look forward to hearing from you soon"
     ],
     "set": "sec",
-    "sec_id": 4
+    "sec_id": 6
   },
   {
-    "id": "P2_05",
+    "id": "P2_07",
     "category": "complaint",
-    "category_vi": "Khiếu nại",
-    "difficulty": "hard",
+    "category_vi": "Khiếu nại & Khắc phục",
+    "difficulty": "medium",
     "email": {
       "from": "A. Chae, General Company",
-      "to": "Fine Prints Customer Service",
+      "to": "Fine Prints",
       "subject": "Printing accident",
       "date": "May 2, 10:32 A.M.",
-      "body": "Dear Fine Prints,\n\nYour company recently prepared letterheads for us. However, I've just noticed that you printed our old address by mistake.\n\nI have to send out hundreds of letters to our customers for a new promotion. Please e-mail me about this as soon as possible.\n\nThank you,\nA. Chae\nGeneral Company"
+      "body": "Dear Fine Prints,\n\nYour company recently prepared letterheads for us. However, I've just noticed that you printed our old address by mistake. I have to send out hundreds of letters to our customers for a new promotion. Please e-mail me about this as soon as possible.\n\nThank you,\nA. Chae"
     },
     "directions": "Respond to the e-mail as if you are an employee at Fine Prints. In your e-mail, make TWO suggestions for how to handle the problem and provide ONE piece of information you think will be useful.",
-    "directions_vi": "Viết email trả lời như thể bạn là nhân viên tại Fine Prints. Trong email, đưa ra HAI đề xuất để xử lý vấn đề và cung cấp MỘT thông tin hữu ích.",
+    "directions_vi": "Viết email trả lời như thể bạn là nhân viên tại Fine Prints. Trong email, hãy đưa ra HAI đề xuất về cách xử lý vấn đề và cung cấp MỘT thông tin hữu ích.",
     "tasks": [
       {
         "type": "make_suggestion",
@@ -164,18 +240,20 @@ const TOEIC_PART2_DATA = [
       }
     ],
     "total_tasks": 3,
-    "sample_answer": "Dear Mr. Chae,\n\nPlease accept our sincere apologies for printing the incorrect address on your company letterheads. We understand how crucial this promotional campaign is for your business.\n\nTo resolve this problem immediately, I suggest that we reprint your entire order with the corrected address today free of charge. Alternatively, if you need materials right away, I suggest we provide pre-printed adhesive correction labels that can be cleanly affixed over the address. For your information, our express press can complete the full reprint within 24 hours, and we will courier them directly to your office tomorrow morning.\n\nWe apologize again for the inconvenience.\n\nSincerely,\n[Your Name]\nFine Prints",
+    "sample_answer": "Dear Mr. Chae,\n\nI am very sorry for the printing mistake on your letterheads. We understand that you need them urgently for your new promotion.\n\nTo handle this problem, I would like to make two suggestions. First, we can reprint all of your letterheads with the correct address free of charge. Second, we can offer you a 20% discount on your next order to make up for this accident.\n\nAdditionally, I want to inform you that our printing team can finish the new letterheads by tomorrow morning.\n\nPlease let me know which option you prefer.\n\nBest regards,\n[Your Name]\nFine Prints",
     "key_phrases": [
-      "Please accept our sincere apologies",
-      "I suggest that we reprint your entire order",
-      "Alternatively, I suggest we provide",
-      "For your information, our express press can complete"
+      "I am very sorry for the printing mistake",
+      "To handle this problem, I would like to make two suggestions",
+      "We can reprint all of your letterheads free of charge",
+      "We can offer you a discount on your next order",
+      "I want to inform you that our printing team can finish",
+      "Please let me know which option you prefer"
     ],
     "set": "sec",
-    "sec_id": 5
+    "sec_id": 7
   },
   {
-    "id": "P2_06",
+    "id": "P2_08",
     "category": "event",
     "category_vi": "Sự kiện",
     "difficulty": "medium",
@@ -207,45 +285,10 @@ const TOEIC_PART2_DATA = [
       "I would like to register two students"
     ],
     "set": "sec",
-    "sec_id": 6
+    "sec_id": 8
   },
   {
-    "id": "P2_07",
-    "category": "welcome",
-    "category_vi": "Chào đón",
-    "difficulty": "easy",
-    "email": {
-      "from": "P. Spata, Department Manager",
-      "to": "A. Means",
-      "subject": "Welcome",
-      "date": "November 9, 4:08 P.M.",
-      "body": "Dear A. Means,\n\nWelcome! I'm happy to have you in our department.\n\nPlease tell me if there is anything I can do to make your transition here more comfortable. And let me know if you have any questions about working in our office.\n\nBest regards,\nP. Spata"
-    },
-    "directions": "Respond to the e-mail as if you are A. Means. In your e-mail, ask TWO questions about working in the new office and make ONE request.",
-    "directions_vi": "Viết email trả lời như thể bạn là A. Means. Trong email, hỏi HAI câu hỏi về việc làm việc tại văn phòng mới và đưa ra MỘT yêu cầu.",
-    "tasks": [
-      {
-        "type": "ask_question",
-        "count": 2
-      },
-      {
-        "type": "make_request",
-        "count": 1
-      }
-    ],
-    "total_tasks": 3,
-    "sample_answer": "Dear Ms. Spata,\n\nThank you very much for the warm welcome. I am thrilled to join the team and look forward to working with everyone in the department.\n\nI have a couple of questions about the office routines. First, what are the standard office working hours and lunch break schedules? Second, is there designated parking available on-site for new staff members? Furthermore, I would like to request a brief meeting with you early next week to discuss my initial assignments and priorities.\n\nThank you again for your support.\n\nSincerely,\nA. Means",
-    "key_phrases": [
-      "Thank you very much for the warm welcome",
-      "What are the standard office working hours",
-      "Is there designated parking available",
-      "I would like to request a brief meeting"
-    ],
-    "set": "sec",
-    "sec_id": 7
-  },
-  {
-    "id": "P2_08",
+    "id": "P2_09",
     "category": "service",
     "category_vi": "Dịch vụ",
     "difficulty": "hard",
@@ -278,10 +321,10 @@ const TOEIC_PART2_DATA = [
       "Could you please send us the original editable file"
     ],
     "set": "sec",
-    "sec_id": 8
+    "sec_id": 9
   },
   {
-    "id": "P2_09",
+    "id": "P2_10",
     "category": "service",
     "category_vi": "Dịch vụ",
     "difficulty": "medium",
@@ -311,41 +354,6 @@ const TOEIC_PART2_DATA = [
       "Could you please tell me the total estimated cost",
       "I suggest that you back up all files",
       "Additionally, I suggest installing an upgraded cooling fan"
-    ],
-    "set": "sec",
-    "sec_id": 9
-  },
-  {
-    "id": "P2_10",
-    "category": "event",
-    "category_vi": "Sự kiện",
-    "difficulty": "easy",
-    "email": {
-      "from": "Tradewinds Apartments Management",
-      "to": "All Residents",
-      "subject": "Annual Residents Meeting",
-      "date": "January 18, 10:00 A.M.",
-      "body": "Dear Residents,\n\nOur annual community meeting will take place next Wednesday at 7:00 P.M. in the clubhouse. We will discuss upcoming facility improvements and community guidelines.\n\nPlease email us any agenda topics you would like to cover.\n\nTradewinds Management"
-    },
-    "directions": "Respond to the e-mail as if you are a resident at Tradewinds Apartments. In your e-mail, suggest TWO topics and ask ONE question about the meeting.",
-    "directions_vi": "Viết email trả lời như thể bạn là cư dân tại Tradewinds Apartments. Trong email, đề xuất HAI chủ đề và hỏi MỘT câu hỏi về cuộc họp.",
-    "tasks": [
-      {
-        "type": "make_suggestion",
-        "count": 2
-      },
-      {
-        "type": "ask_question",
-        "count": 1
-      }
-    ],
-    "total_tasks": 3,
-    "sample_answer": "Dear Tradewinds Management,\n\nThank you for organizing the annual residents meeting. I plan to attend next Wednesday.\n\nI would like to suggest two topics for the meeting agenda. First, I suggest discussing improved lighting in the underground parking garage to increase resident safety. Second, I suggest reviewing the fitness center operating hours so residents can exercise earlier in the morning. Finally, will meeting minutes or a video recording be distributed afterward for neighbors unable to attend?\n\nThank you for your dedication to our community.\n\nSincerely,\n[Your Name]\nResident #402",
-    "key_phrases": [
-      "Thank you for organizing the annual residents meeting",
-      "I suggest discussing improved lighting",
-      "Second, I suggest reviewing the fitness center hours",
-      "Will meeting minutes or a recording be distributed"
     ],
     "set": "sec",
     "sec_id": 10
