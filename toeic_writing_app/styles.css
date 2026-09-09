@@ -1669,3 +1669,137 @@ body.ui-confirm-open { overflow: hidden; }
   color: var(--text-muted);
 }
 
+/* ==========================================================================
+   FEEDBACK & SUPPORT WIDGET & MODAL
+   ========================================================================== */
+
+/* Floating Feedback Button */
+.floating-feedback-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-feedback-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+  filter: brightness(1.08);
+}
+
+.floating-feedback-btn:active {
+  transform: translateY(0);
+}
+
+.feedback-modal-box {
+  max-width: 540px;
+}
+
+.feedback-channels-card {
+  background: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-channels-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.feedback-channels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.feedback-channel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.feedback-channel-btn.zalo-btn {
+  background: rgba(0, 104, 255, 0.12);
+  color: #0068ff;
+  border-color: rgba(0, 104, 255, 0.25);
+}
+
+.feedback-channel-btn.zalo-btn:hover {
+  background: #0068ff;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 104, 255, 0.3);
+}
+
+.feedback-channel-btn.facebook-btn {
+  background: rgba(24, 119, 242, 0.12);
+  color: #1877f2;
+  border-color: rgba(24, 119, 242, 0.25);
+}
+
+.feedback-channel-btn.facebook-btn:hover {
+  background: #1877f2;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+}
+
+.feedback-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.feedback-divider::before,
+.feedback-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.feedback-divider span {
+  padding: 0 0.65rem;
+}
+
+@media (max-width: 640px) {
+  .feedback-channels-grid {
+    grid-template-columns: 1fr;
+  }
+  .floating-feedback-btn {
+    bottom: 16px;
+    right: 16px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
