@@ -816,6 +816,17 @@
     if (btn) {
       btn.addEventListener('click', function () { advanceBlock(); });
     }
+    var backBtn = document.getElementById('prevQBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function () {
+        var p = prevQInBlock();
+        if (!p) return;
+        saveCurrentAnswer();
+        exam.activeQ = p;
+        renderQuestion(p);
+        renderProgressDots();
+      });
+    }
     renderBlockHeader();
     renderProgressDots();
   }
@@ -926,6 +937,13 @@
     var btnLabel = advanceBtnLabel();
     var btnCls = isSubmit ? 'btn btn-accent ft-submit-btn' : 'btn btn-accent ft-next-btn';
     var actionBtn = '<button id="advanceBtn" class="' + btnCls + '" title="' + (isSubmit ? 'Nộp bài và nhận báo cáo (Ctrl + Enter)' : 'Lưu và sang bước tiếp theo (Ctrl + Enter)') + '">' + esc(btnLabel) + '</button>';
+
+    // Nút "câu trước" — chỉ hiện khi đang ở Part 1 (nhiều câu trong 1 khối) và có câu trước
+    var showBack = part === 'p1' && !locked && !!prevQInBlock();
+    var backBtn = showBack
+      ? '<button id="prevQBtn" class="btn btn-outline ft-back-btn" title="Quay lại câu trước (Ctrl + ←)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Câu trước</button>'
+      : '';
+
     var label = part === 'p1' ? 'Câu trả lời của bạn' : part === 'p2' ? 'Email trả lời của bạn' : 'Bài luận của bạn';
     return (
       '<div class="card exam-answer-card">' +
@@ -938,7 +956,7 @@
             '<span class="count-pill"><strong id="ftSentenceCount">0</strong> câu</span>' +
           '</div>' +
         '</div>' +
-        '<div class="answer-actions">' + actionBtn + '</div>' +
+        '<div class="answer-actions">' + backBtn + actionBtn + '</div>' +
       '</div>'
     );
   }
@@ -1115,8 +1133,15 @@
     var pct = Math.max(0, Math.min(100, (est / 200) * 100));
     var fill = document.getElementById('scorebarFill');
     if (fill) fill.style.width = pct + '%';
+    // Clamp marker/bubble INSIDE the track so chúng không lòi ra ngoài thanh.
+    var clamped = Math.max(1.5, Math.min(98.5, pct));
     var marker = document.getElementById('scorebarMarker');
-    if (marker) marker.style.left = pct + '%';
+    if (marker) marker.style.left = clamped + '%';
+    var bubble = document.getElementById('scorebarBubble');
+    if (bubble) {
+      bubble.style.left = clamped + '%';
+      bubble.textContent = est;
+    }
 
     // descriptions — ghi rõ cách chấm: AI hỗ trợ hay quy tắc cục bộ (hard)
     var gradeBadge = document.getElementById('reportGradeBadge');

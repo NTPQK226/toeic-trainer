@@ -345,9 +345,24 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
 }
 .count-pill strong { color: var(--text-main); }
 
-/* Answer action (full-height fill at bottom of right card) */
-.answer-actions { display: flex; margin-top: 0.8rem; }
-.answer-actions #advanceBtn { width: 100%; min-height: 48px; font-weight: 800; font-size: 0.95rem; }
+/* Answer action (bottom of right card): back (Part 1) + advance */
+.answer-actions { display: flex; gap: 0.6rem; margin-top: 0.8rem; }
+.answer-actions #advanceBtn { flex: 1 1 auto; min-height: 48px; font-weight: 800; font-size: 0.95rem; }
+.answer-actions .ft-back-btn {
+  flex: 0 0 auto;
+  min-height: 48px;
+  padding: 0.55rem 1rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+}
+.answer-actions .ft-back-btn:hover { color: var(--primary); border-color: var(--primary); }
+@media (max-width: 560px) {
+  .answer-actions { flex-direction: column-reverse; }
+  .answer-actions .ft-back-btn { width: 100%; justify-content: center; }
+}
 
 /* Orange primary CTA for all main full-test actions (user request: đồng bộ màu cam) */
 .btn-accent,
@@ -401,47 +416,62 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
 .rh-est strong { color: var(--primary); }
 .rh-est small { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
 
-/* Horizontal 0-200 score bar */
-.scorebar { margin: 0.2rem 0 0.7rem; }
+/* Horizontal 0-200 score bar (kiểu báo cáo TOEIC) */
+.scorebar { margin: 0.4rem 0 0.6rem; }
+.scorebar-bubble-row { position: relative; height: 26px; }
+.scorebar-bubble {
+  position: absolute;
+  transform: translateX(-50%);
+  top: 0;
+  min-width: 44px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(37,99,235,0.35);
+  transition: left 0.4s ease;
+  z-index: 3;
+}
 .scorebar-track {
   position: relative;
-  height: 14px;
+  height: 16px;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #ef4444, #f59e0b 30%, #facc15 50%, #10b981 72%, #059669 100%);
+  background: linear-gradient(90deg, #ef4444 0%, #f59e0b 25%, #facc15 50%, #10b981 75%, #059669 100%);
   border: 1px solid var(--border-color);
-  overflow: visible;
+  overflow: hidden;
 }
 .scorebar-fill {
   position: absolute;
   left: 0; top: 0; bottom: 0;
   border-radius: 9999px;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.18);
+  transition: width 0.4s ease;
 }
-[data-theme="dark"] .scorebar-fill { background: rgba(0,0,0,0.4); }
+[data-theme="dark"] .scorebar-fill { background: rgba(0,0,0,0.38); }
 .scorebar-marker {
   position: absolute;
-  top: -5px;
-  transform: translateX(-50%);
-  width: 0; height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 16px solid var(--text-main);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.5);
   transition: left 0.4s ease;
   z-index: 2;
+  pointer-events: none;
 }
-[data-theme="dark"] .scorebar-marker { border-top-color: #f1f5f9; }
-.scorebar-marker::after {
-  content: '';
-  position: absolute;
-  left: -5px; top: -5px;
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 2px rgba(37,99,235,0.3);
-}
-.scorebar-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-top: 0.15rem; font-weight: 600; }
-.scorebar-bands { display: flex; gap: 0.35rem; margin-top: 0.35rem; }
-.scorebar-bands span { flex: 1; text-align: center; font-size: 0.66rem; font-weight: 700; color: #fff; padding: 0.14rem 0.3rem; border-radius: 6px; }
+.scorebar-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; font-weight: 700; }
+.scorebar-bands { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+.scorebar-bands .sb-band { flex: 1; text-align: center; font-size: 0.78rem; font-weight: 700; color: #fff; padding: 0.2rem 0.3rem; border-radius: 6px; }
+.scorebar-bands .b1 { background: #ef4444; }
+.scorebar-bands .b2 { background: #f59e0b; }
+.scorebar-bands .b3 { background: #facc15; color: #713f12; }
+.scorebar-bands .b4 { background: #10b981; }
+.scorebar-bands .b5 { background: #059669; }
 
 .report-hero .rh-grade {
   display: inline-block;
@@ -501,7 +531,8 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
 .score-badge.score-5 { background: #065f46; color: #fff; }
 .ai-badge { background: #8b5cf6; color: #fff; font-size: 0.66rem; padding: 0.06rem 0.4rem; border-radius: var(--radius-full); }
 
-.rd-question-block img { border-radius: var(--radius-md); max-height: 260px; object-fit: contain; margin-top: 0.4rem; }
+.rd-question-block img { display: block; max-width: 100%; width: auto; border-radius: var(--radius-md); max-height: 260px; object-fit: contain; margin-top: 0.4rem; }
+.rd-item, .rd-question-block { min-width: 0; overflow: hidden; }
 
 .rd-user-answer { background: var(--bg-main); border-left: 4px solid var(--primary); padding: 0.6rem 0.8rem; border-radius: var(--radius-md); margin-bottom: 0.55rem; font-size: 0.86rem; white-space: pre-wrap; word-break: break-word; }
 .rd-user-answer .ua-label { display: block; font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.15rem; }
@@ -519,6 +550,15 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
 .report-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 0.6rem; }
 .report-actions .btn { min-height: 46px; padding: 0.55rem 1.3rem; }
 .report-actions .btn svg { margin-right: 0.3rem; }
+/* Nút chính trong report cũng đồng bộ màu cam như các nút full-test khác */
+.report-actions .btn-primary {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+.report-actions .btn-primary:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.42);
+}
 
 /* ==========================================================================
    RESPONSIVE
@@ -545,3 +585,23 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
   .setup-actions .btn { width: 100%; }
   .brand-text span { display: none; }
 }
+
+/* ==========================================================================
+   MODAL + CONFIRM màu đồng bộ với full test (cam/gold thay vì xanh mặc định)
+   ========================================================================== */
+.modal-title svg { color: #d97706; }
+.modal-overlay .btn-primary,
+.ui-confirm-actions .btn-primary,
+.ui-confirm-actions .ui-confirm-ok {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+.modal-overlay .btn-primary:hover,
+.ui-confirm-actions .btn-primary:hover,
+.ui-confirm-actions .ui-confirm-ok:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.42);
+}
+/* Header actions / rubric icon trên hero nếu có */
+.report-hero .rh-label,
+.setup-head h2 { color: var(--text-main); }

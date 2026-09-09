@@ -469,6 +469,14 @@
       }
     ];
 
+    // Câu TRỐNG / chưa nhập → mọi tiêu chí đều ✗ (không được "tự cho" tick ngữ pháp/chủ ngữ).
+    if (!raw || tokens.length === 0) {
+      for (let i = 0; i < criteria.length; i++) {
+        criteria[i].passed = false;
+        criteria[i].detail = 'Chưa nhập câu trả lời.';
+      }
+    }
+
     return {
       score,
       label,

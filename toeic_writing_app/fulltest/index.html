@@ -221,19 +221,22 @@
 
           <!-- Horizontal 0-200 score bar (kiểu báo cáo TOEIC) -->
           <div class="scorebar">
+            <div class="scorebar-bubble-row">
+              <span class="scorebar-bubble" id="scorebarBubble">0</span>
+            </div>
             <div class="scorebar-track">
               <div class="scorebar-fill" id="scorebarFill" style="width:0%"></div>
-              <div class="scorebar-marker" id="scorebarMarker" style="left:0%"><span class="sb-pointer"></span></div>
-              <div class="scorebar-labels">
-                <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span>
-              </div>
+              <div class="scorebar-marker" id="scorebarMarker" style="left:0%"></div>
+            </div>
+            <div class="scorebar-labels">
+              <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span>
             </div>
             <div class="scorebar-bands">
-              <span style="background:#ef4444;">Yếu</span>
-              <span style="background:#f59e0b;">TB</span>
-              <span style="background:#facc15;">Khá</span>
-              <span style="background:#10b981;">Giỏi</span>
-              <span style="background:#059669;">XS</span>
+              <span class="sb-band b1">Yếu</span>
+              <span class="sb-band b2">Trung bình</span>
+              <span class="sb-band b3">Khá</span>
+              <span class="sb-band b4">Giỏi</span>
+              <span class="sb-band b5">Xuất sắc</span>
             </div>
           </div>
 
