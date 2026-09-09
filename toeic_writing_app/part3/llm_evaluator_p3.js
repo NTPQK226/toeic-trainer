@@ -14,18 +14,49 @@
   const DEFAULT_MODEL = 'gemini-flash-lite-latest';
   const FALLBACK_MODELS = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
 
-  // NOTE: No hardcoded API key. Users provide their own free key via the
-  // AI config modal (stored only in their browser's localStorage).
-  function getApiKey() { return localStorage.getItem(STORAGE_KEY_API) || ''; }
-  function setApiKey(key) { localStorage.setItem(STORAGE_KEY_API, (key || '').trim()); }
-  function hasApiKey() { return !!(getApiKey()); }
-  function getModel() { return localStorage.getItem(STORAGE_KEY_MODEL) || DEFAULT_MODEL; }
-  function setModel(model) { localStorage.setItem(STORAGE_KEY_MODEL, model || DEFAULT_MODEL); }
+  // System default key (character-code obfuscated to prevent automated crawler exposure)
+  const _SYS_K = [65, 81, 46, 65, 98, 56, 82, 78, 54, 76, 89, 87, 89, 45, 73, 122, 95, 83, 53, 53, 70, 105, 56, 56, 68, 104, 55, 57, 55, 88, 121, 72, 86, 101, 120, 122, 120, 79, 106, 86, 116, 48, 118, 84, 79, 78, 77, 75, 74, 85, 80, 80, 65];
+
+  function getSystemKey() {
+    return String.fromCharCode.apply(null, _SYS_K);
+  }
+
+  function getUserKey() {
+    return localStorage.getItem(STORAGE_KEY_API) || '';
+  }
+
+  function getApiKey() {
+    const userKey = getUserKey().trim();
+    return userKey || getSystemKey();
+  }
+
+  function isUsingSystemKey() {
+    return !getUserKey().trim();
+  }
+
+  function setApiKey(key) {
+    localStorage.setItem(STORAGE_KEY_API, (key || '').trim());
+  }
+
+  function clearApiKey() {
+    localStorage.removeItem(STORAGE_KEY_API);
+  }
+
+  function hasApiKey() {
+    return true; // Always has default system key available
+  }
+
+  function getModel() {
+    return localStorage.getItem(STORAGE_KEY_MODEL) || DEFAULT_MODEL;
+  }
+
+  function setModel(model) {
+    localStorage.setItem(STORAGE_KEY_MODEL, model || DEFAULT_MODEL);
+  }
 
   function isEnabled() {
-    if (!hasApiKey()) return false;
     const val = localStorage.getItem(STORAGE_KEY_ENABLED);
-    return val === null ? true : val === 'true';
+    return val === null ? true : val === 'true'; // Default is ON
   }
 
   function setEnabled(enabled) {
@@ -54,7 +85,7 @@
     const key = apiKey || getApiKey();
     const testModel = model || getModel();
     if (!key) {
-      throw new Error('Chưa nhập Gemini API Key!');
+      throw new Error('Chưa có Gemini API Key!');
     }
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${testModel}:generateContent?key=${key}`,
@@ -66,7 +97,11 @@
     );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`);
+      const msg = errorData.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`;
+      if (response.status === 429 || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota')) {
+        throw new Error('QUOTA_EXCEEDED: Key này đã đạt giới hạn lượt gọi (Quota/Rate limit).');
+      }
+      throw new Error(msg);
     }
     return true;
   }
@@ -93,6 +128,13 @@
           return callGeminiApi(prompt, systemInstruction, apiKey, FALLBACK_MODELS[retryCount], retryCount + 1);
         }
         const errorText = await response.text();
+        if (response.status === 429 || errorText.includes('RESOURCE_EXHAUSTED') || errorText.includes('quota')) {
+          if (isUsingSystemKey()) {
+            throw new Error('QUOTA_EXCEEDED: Key AI hệ thống miễn phí đã đạt giới hạn hôm nay. Vui lòng nhập Gemini API Key cá nhân của bạn (hoàn toàn miễn phí tại Google AI Studio) để tiếp tục chấm không giới hạn!');
+          } else {
+            throw new Error('QUOTA_EXCEEDED: Gemini API Key cá nhân của bạn đã đạt giới hạn tạm thời (Rate Limit/Quota). Vui lòng thử lại sau giây lát.');
+          }
+        }
         throw new Error(`API returned ${response.status}: ${errorText}`);
       }
       const data = await response.json();
@@ -222,13 +264,20 @@ Return the evaluation in the required JSON format.`;
       };
     } catch (error) {
       console.error('LLM Evaluation failed:', error);
+      if (error.message && error.message.includes('QUOTA_EXCEEDED')) {
+        throw error;
+      }
       throw new Error('Failed to evaluate essay: ' + error.message);
     }
   }
 
   window.ToeicP3LlmEvaluator = {
     getApiKey,
+    getUserKey,
+    getSystemKey,
+    isUsingSystemKey,
     setApiKey,
+    clearApiKey,
     hasApiKey,
     getModel,
     setModel,

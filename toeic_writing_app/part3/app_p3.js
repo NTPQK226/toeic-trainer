@@ -167,14 +167,17 @@
   function closeModal(modalEl) { if (modalEl) modalEl.classList.remove('active'); }
   function initModals() {
     const modals = [el.rubricModal, el.tipsModal, el.submitModal, el.aiConfigModal];
-    const openers = [
-      [el.rubricBtn, el.rubricModal],
-      [el.tipsBtn, el.tipsModal],
-      [el.aiConfigBtn, el.aiConfigModal]
-    ];
-    openers.forEach(([btn, modal]) => {
-      if (btn && modal) btn.addEventListener('click', () => openModal(modal));
-    });
+    if (el.rubricBtn) el.rubricBtn.addEventListener('click', () => openModal(el.rubricModal));
+    if (el.tipsBtn) el.tipsBtn.addEventListener('click', () => openModal(el.tipsModal));
+    if (el.aiConfigBtn) {
+      el.aiConfigBtn.addEventListener('click', () => {
+        if (window.ToeicP3LlmEvaluator && el.aiApiKeyInput) {
+          el.aiApiKeyInput.value = window.ToeicP3LlmEvaluator.getUserKey();
+        }
+        if (el.aiTestStatus) el.aiTestStatus.style.display = 'none';
+        openModal(el.aiConfigModal);
+      });
+    }
     document.querySelectorAll('.close-btn[data-close]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = document.getElementById(btn.getAttribute('data-close'));
@@ -228,7 +231,7 @@
   function initAiConfig() {
     if (!window.ToeicP3LlmEvaluator) return;
     const enabled = window.ToeicP3LlmEvaluator.isEnabled();
-    if (el.aiApiKeyInput) el.aiApiKeyInput.value = window.ToeicP3LlmEvaluator.getApiKey();
+    if (el.aiApiKeyInput) el.aiApiKeyInput.value = window.ToeicP3LlmEvaluator.getUserKey();
     if (el.aiModelSelect) el.aiModelSelect.value = window.ToeicP3LlmEvaluator.getModel();
     updateAiToggleUI();
 
@@ -251,7 +254,7 @@
         window.ToeicP3LlmEvaluator.setModel(model);
         window.ToeicP3LlmEvaluator.setEnabled(true);
         updateAiToggleUI();
-        showAiStatus('Đã lưu cấu hình AI thành công!', 'success');
+        showAiStatus('Đã lưu cấu hình và kích hoạt Giám Khảo AI thành công!', 'success');
         setTimeout(() => closeModal(el.aiConfigModal), 900);
       });
     }
@@ -260,12 +263,11 @@
       el.testAiConfigBtn.addEventListener('click', async () => {
         const key = (el.aiApiKeyInput.value || '').trim();
         const model = el.aiModelSelect.value;
-        if (!key) { showAiStatus('Vui lòng nhập API Key để kiểm tra!', 'warning'); return; }
         el.testAiConfigBtn.disabled = true;
-        showAiStatus('Đang kiểm tra kết nối...', 'info');
+        showAiStatus('Đang kiểm tra kết nối tới Google Gemini...', 'info');
         try {
           await window.ToeicP3LlmEvaluator.testConnection(key, model);
-          showAiStatus('Kết nối thành công! Bạn có thể dùng Giám Khảo AI.', 'success');
+          showAiStatus('Kết nối thành công 100%! API Key hợp lệ và sẵn sàng chấm thi.', 'success');
         } catch (err) {
           showAiStatus('Kết nối thất bại: ' + err.message, 'error');
         } finally {
@@ -275,20 +277,11 @@
     }
 
     if (el.clearAiConfigBtn) {
-      el.clearAiConfigBtn.addEventListener('click', async () => {
-        let ok = false;
-        if (window.ToeicUi) {
-          ok = await window.ToeicUi.confirm('Bạn có chắc muốn xoá API Key đã lưu?', { title: 'Xoá API Key', okText: 'Xoá', cancelText: 'Huỷ', danger: true });
-        } else {
-          ok = confirm('Bạn có chắc muốn xoá API Key đã lưu?');
-        }
-        if (ok) {
-          window.ToeicP3LlmEvaluator.setApiKey('');
-          window.ToeicP3LlmEvaluator.setEnabled(false);
-          if (el.aiApiKeyInput) el.aiApiKeyInput.value = '';
-          updateAiToggleUI();
-          showAiStatus('Đã xoá API Key.', 'info');
-        }
+      el.clearAiConfigBtn.addEventListener('click', () => {
+        window.ToeicP3LlmEvaluator.clearApiKey();
+        if (el.aiApiKeyInput) el.aiApiKeyInput.value = '';
+        updateAiToggleUI();
+        showAiStatus('Đã xoá Key cá nhân. Hệ thống tự động chuyển sang Key dùng thử miễn phí chung.', 'info');
       });
     }
   }
@@ -591,7 +584,18 @@
         } catch (err) {
           console.warn('AI error, fallback offline:', err);
           result = window.ToeicP3Evaluator.evaluate(essay, q);
-          if (window.ToeicUi) window.ToeicUi.toast('Giám khảo AI lỗi — đã dùng bộ chấm Offline.', 'error');
+          if (err.message && err.message.includes('QUOTA_EXCEEDED')) {
+            const cleanMsg = err.message.replace('QUOTA_EXCEEDED: ', '');
+            if (window.ToeicUi) {
+              window.ToeicUi.toast(cleanMsg, 'warning', 6000);
+            } else {
+              alert(cleanMsg);
+            }
+            openModal(el.aiConfigModal);
+          } else {
+            if (window.ToeicUi) window.ToeicUi.toast('Giám khảo AI lỗi — đã dùng bộ chấm Offline.', 'error');
+            else alert(`Giám khảo AI lỗi (${err.message}) — đã dùng bộ chấm Offline.`);
+          }
         }
       } else {
         result = window.ToeicP3Evaluator.evaluate(essay, q);

@@ -206,7 +206,7 @@
 
     const openAiConfig = () => {
       if (window.ToeicLlmEvaluator) {
-        if (el.aiApiKeyInput) el.aiApiKeyInput.value = window.ToeicLlmEvaluator.getApiKey();
+        if (el.aiApiKeyInput) el.aiApiKeyInput.value = window.ToeicLlmEvaluator.getUserKey();
         if (el.aiModelSelect) el.aiModelSelect.value = window.ToeicLlmEvaluator.getModel();
       }
       if (el.aiTestStatus) el.aiTestStatus.style.display = 'none';
@@ -240,16 +240,11 @@
   function initAiConfig() {
     if (!window.ToeicLlmEvaluator) return;
 
-    if (el.aiApiKeyInput) el.aiApiKeyInput.value = window.ToeicLlmEvaluator.getApiKey();
+    if (el.aiApiKeyInput) el.aiApiKeyInput.value = window.ToeicLlmEvaluator.getUserKey();
     if (el.aiModelSelect) el.aiModelSelect.value = window.ToeicLlmEvaluator.getModel();
     updateAiToggleUI();
 
     function handleAiToggle() {
-      if (!window.ToeicLlmEvaluator.hasApiKey()) {
-        openModal(el.aiConfigModal);
-        showAiStatus('Vui lòng dán Gemini API Key của bạn để kích hoạt Giám Khảo AI nhé!', 'warning');
-        return;
-      }
       const currentlyEnabled = window.ToeicLlmEvaluator.isEnabled();
       window.ToeicLlmEvaluator.setEnabled(!currentlyEnabled);
       updateAiToggleUI();
@@ -266,12 +261,10 @@
       el.saveAiConfigBtn.addEventListener('click', () => {
         const key = el.aiApiKeyInput.value.trim();
         const model = el.aiModelSelect.value;
-        if (!key) {
-          showAiStatus('Vui lòng nhập hoặc dán Gemini API Key trước khi lưu!', 'warning');
-          return;
-        }
 
-        window.ToeicLlmEvaluator.setApiKey(key);
+        if (key) {
+          window.ToeicLlmEvaluator.setApiKey(key);
+        }
         window.ToeicLlmEvaluator.setModel(model);
         window.ToeicLlmEvaluator.setEnabled(true);
         updateAiToggleUI();
@@ -295,10 +288,6 @@
       el.testAiConfigBtn.addEventListener('click', async () => {
         const key = el.aiApiKeyInput.value.trim();
         const model = el.aiModelSelect.value;
-        if (!key) {
-          showAiStatus('Vui lòng nhập API Key trước khi kiểm tra kết nối!', 'warning');
-          return;
-        }
 
         const origHtml = el.testAiConfigBtn.innerHTML;
         el.testAiConfigBtn.disabled = true;
@@ -320,10 +309,9 @@
     if (el.clearAiConfigBtn) {
       el.clearAiConfigBtn.addEventListener('click', () => {
         el.aiApiKeyInput.value = '';
-        window.ToeicLlmEvaluator.setApiKey('');
-        window.ToeicLlmEvaluator.setEnabled(false);
+        window.ToeicLlmEvaluator.clearApiKey();
         updateAiToggleUI();
-        showAiStatus('Đã xoá API Key khỏi thiết bị và chuyển AI về trạng thái TẮT.', 'info');
+        showAiStatus('Đã xoá Key cá nhân. Hệ thống tự động chuyển sang Key dùng thử miễn phí chung.', 'info');
       });
     }
   }
@@ -969,10 +957,20 @@
         const fallback = window.ToeicEvaluator.evaluate(userSentence, prompt, q);
         practiceEvaluations[q.id] = fallback;
         displayPracticeFeedback(fallback, prompt, q);
-        if (window.ToeicUi) {
-          window.ToeicUi.toast('Không thể gọi Giám Khảo AI. Đã tự động dùng bộ chấm Offline.', 'error');
+        if (err.message && err.message.includes('QUOTA_EXCEEDED')) {
+          const cleanMsg = err.message.replace('QUOTA_EXCEEDED: ', '');
+          if (window.ToeicUi) {
+            window.ToeicUi.toast(cleanMsg, 'warning', 6000);
+          } else {
+            alert(cleanMsg);
+          }
+          openModal(el.aiConfigModal);
         } else {
-          alert(`Không thể gọi Giám Khảo AI (${err.message}). Đã tự động dùng bộ chấm Offline.`);
+          if (window.ToeicUi) {
+            window.ToeicUi.toast('Không thể gọi Giám Khảo AI. Đã tự động dùng bộ chấm Offline.', 'error');
+          } else {
+            alert(`Không thể gọi Giám Khảo AI (${err.message}). Đã tự động dùng bộ chấm Offline.`);
+          }
         }
       } finally {
         el.checkAnswerBtn.innerHTML = origHtml;
