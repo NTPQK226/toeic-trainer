@@ -1266,7 +1266,9 @@ select.custom-select option, .custom-select option {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.32rem 0.65rem;
+  padding: 0.42rem 0.75rem;
+  min-height: 38px;
+  height: auto;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--border-color);
   background: var(--bg-card);
@@ -1296,9 +1298,9 @@ select.custom-select option, .custom-select option {
 }
 
 .cs-label-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
   flex: 1;
   text-align: left;
 }
@@ -1306,6 +1308,7 @@ select.custom-select option, .custom-select option {
 .cs-icon-wrapper {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   color: var(--text-muted);
   transition: transform 0.2s ease;
 }
@@ -1320,8 +1323,8 @@ select.custom-select option, .custom-select option {
   left: 0;
   min-width: 100%;
   width: max-content;
-  max-width: min(440px, calc(100vw - 1rem));
-  max-height: 280px;
+  max-width: min(580px, calc(100vw - 1.5rem));
+  max-height: 320px;
   overflow-y: auto;
   background: var(--bg-card);
   border: 1.5px solid var(--border-color);
@@ -1370,10 +1373,10 @@ select.custom-select option, .custom-select option {
 
 .cs-option-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.38rem 0.65rem;
+  padding: 0.42rem 0.65rem;
   border-radius: var(--radius-sm);
   font-size: 0.83rem;
   font-weight: 500;
@@ -1395,9 +1398,20 @@ select.custom-select option, .custom-select option {
   font-weight: 700;
 }
 
+.cs-option-text {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+  text-align: left;
+}
+
 .cs-option-check {
   display: none;
   color: #818cf8;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .cs-option-item.selected .cs-option-check {
