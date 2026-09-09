@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TOEIC Writing Part 2 - Viết Email Trả Lời | 50 Đề Chuẩn Khảo Thí ETS</title>
-  <meta name="description" content="Ứng dụng luyện thi TOEIC Writing Part 2 - Respond to a Written Request. 50 đề email chuẩn ETS, chấm điểm AI Gemini, thang 0-4.">
+  <title>TOEIC Writing Part 2 - Viết Email Trả Lời | 30 Đề Chuẩn Khảo Thí ETS</title>
+  <meta name="description" content="Ứng dụng luyện thi TOEIC Writing Part 2 - Respond to a Written Request. 30 đề email chuẩn ETS, chấm điểm AI Gemini, thang 0-4.">
   <link rel="stylesheet" href="styles_p2.css">
 </head>
 <body>
@@ -18,21 +18,23 @@
         <div class="brand-icon">T2</div>
         <div class="brand-text">
           <h1>TOEIC WRITING PART 2</h1>
-          <span>50 Đề Viết Email • Chuẩn Khảo Thí ETS (Questions 6 & 7)</span>
+          <span>30 Đề Viết Email • Chuẩn Khảo Thí ETS (Questions 6 & 7)</span>
         </div>
       </div>
 
       <!-- Top Bar Part Switcher -->
-      <nav class="part-switcher" aria-label="Chọn phần thi TOEIC Writing">
-        <a href="../index.html" class="part-tab" title="Chuyển sang Part 1: Mô Tả Tranh">
+      <nav class="part-switcher" aria-label="TOEIC Writing Parts">
+        <a href="../index.html" class="part-tab" title="Part 1: Photos (Questions 1–5)">
           <span class="part-pill">Part 1</span>
-          <span class="part-name">Mô Tả Tranh</span>
-          <span class="part-count">155 câu</span>
+          <span class="part-name">Photos</span>
         </a>
-        <a href="./index.html" class="part-tab active" title="Đang ở Part 2: Viết Email">
+        <a href="./index.html" class="part-tab active" title="Part 2: Email (Questions 6–7)">
           <span class="part-pill">Part 2</span>
-          <span class="part-name">Viết Email</span>
-          <span class="part-count">50 đề</span>
+          <span class="part-name">Email</span>
+        </a>
+        <a href="../part3/index.html" class="part-tab" title="Part 3: Essay (Question 8)">
+          <span class="part-pill">Part 3</span>
+          <span class="part-name">Essay</span>
         </a>
       </nav>
 
@@ -222,9 +224,9 @@
           <div class="practice-filter-group">
             <label for="practiceCategoryFilter" style="font-weight: 700; font-size: 0.88rem;">Bộ đề & Chủ đề:</label>
             <select id="practiceCategoryFilter" class="custom-select">
-              <option value="all">Tất cả 50 đề</option>
+              <option value="all">Tất cả 30 đề</option>
               <option value="sec">Bộ Đề SEC (10 Câu Mới)</option>
-              <option value="core">Bộ 40 Đề Luyện Tập Cơ Bản</option>
+              <option value="core">Bộ 20 Đề Luyện Tập Cơ Bản</option>
               <option value="invitation">Lời mời (Invitation)</option>
               <option value="inquiry">Hỏi thông tin (Inquiry)</option>
               <option value="complaint">Khiếu nại (Complaint)</option>
@@ -300,7 +302,7 @@
             <div class="response-card-header">
               <div class="response-title">
                 <span>Soạn Thư Trả Lời</span>
-                <span id="practiceQuestionBadge" class="task-badge">Câu 1/50</span>
+                <span id="practiceQuestionBadge" class="task-badge">Câu 1/30</span>
               </div>
               <div class="word-count-pills">
                 <div class="count-pill"><strong id="practiceWordCount">0</strong> từ</div>
@@ -390,7 +392,7 @@
   </main>
 
   <footer class="app-footer">
-    <p>TOEIC Writing Part 2 • 50 Đề Viết Email Chuẩn Khảo Thí ETS • Hỗ trợ Giám khảo AI Gemini 2026</p>
+    <p>TOEIC Writing Part 2 • 30 Đề Viết Email Chuẩn Khảo Thí ETS • Hỗ trợ Giám khảo AI Gemini 2026</p>
   </footer>
 
   <!-- ====================================================================
@@ -585,6 +587,7 @@
   <script src="evaluator_p2.js"></script>
   <script src="llm_evaluator_p2.js"></script>
   <script src="custom_select.js"></script>
+  <script src="ui_feedback.js"></script>
   <script src="app_p2.js"></script>
 </body>
 </html>

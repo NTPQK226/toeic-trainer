@@ -346,6 +346,20 @@
     return issues;
   }
 
+  // Rule: sentence must name its subject (a noun phrase) BEFORE using a pronoun.
+  // A Part-1 sentence that BEGINS with "he/she/they/we/you" leaves the examiner
+  // guessing who is being described, so it is treated as an error.
+  function checkClearAntecedent(rawText, tokens) {
+    const SUBJECT_PRONOUNS = ['he', 'she', 'they', 'we', 'you'];
+    if (tokens.length > 0 && SUBJECT_PRONOUNS.includes(tokens[0])) {
+      return {
+        passed: false,
+        detail: `Câu mở đầu bằng đại từ "${tokens[0]}" nhưng chưa nêu danh từ chủ thể (vd: The woman, Two men, A customer...). Giám khảo không biết "${tokens[0]}" ám chỉ ai — hãy nêu người/vật cụ thể trước.`
+      };
+    }
+    return { passed: true, detail: 'Đã nêu chủ thể cụ thể trước khi dùng đại từ (nếu có)' };
+  }
+
   // MAIN EVALUATION FUNCTION
   function evaluatePart1(userSentence, promptObj) {
     const raw = (userSentence || '').trim();
@@ -358,6 +372,13 @@
 
     const struct = analyzeSentenceStructure(raw);
     const grammarIssues = analyzeGrammarHeuristics(raw, tokens);
+    const antecedentCheck = checkClearAntecedent(raw, tokens);
+    // Antecedent violation counts as a grammar "error" for scoring purposes
+    // (it prevents a 3/3 because the subject is ambiguous), but is reported
+    // through its own dedicated criterion & message.
+    const effectiveErrors = antecedentCheck.passed
+      ? grammarIssues.filter(i => i.type === 'error')
+      : [...grammarIssues.filter(i => i.type === 'error'), { type: 'error' }];
 
     let score = 0;
     let label = 'Score 0 - Không Đạt';
@@ -376,7 +397,7 @@
       label = 'Score 0 - Chưa Đạt Yêu Cầu Từ Khoá';
       feedback = 'Câu của bạn không chứa bất kỳ từ khoá bắt buộc nào trong số 2 từ cho trước.';
     } else if (matchedCount === 1) {
-      const hasMajorGrammarError = grammarIssues.some(i => i.type === 'error');
+      const hasMajorGrammarError = effectiveErrors.length > 0;
       if (hasMajorGrammarError || !struct.isValidSingleSentence) {
         score = 1;
         label = 'Score 1 - Cần Cải Thiện';
@@ -387,21 +408,27 @@
         feedback = 'Câu viết đúng ngữ pháp nhưng mới chỉ sử dụng được 1 trong 2 từ khoá bắt buộc.';
       }
     } else if (matchedCount >= totalKeywords) {
-      const errors = grammarIssues.filter(i => i.type === 'error');
+      const errors = effectiveErrors;
       const warnings = grammarIssues.filter(i => i.type === 'warning');
+      // Per the official ETS rubric, 3 points requires a sentence that is
+      // fully correct: no grammar error, no spelling/punctuation warning,
+      // correct single-sentence format. Any error or structure warning
+      // (missing capital, missing period, run-on, repeated word) caps at 2.
+      const structWarnings = struct.issues.filter(i => i.type === 'warning');
+      const hasStructIssue = structWarnings.length > 0;
 
-      if (errors.length === 0 && warnings.length === 0 && struct.isValidSingleSentence) {
+      if (errors.length === 0 && warnings.length === 0 && !hasStructIssue && struct.isValidSingleSentence) {
         score = 3;
         label = 'Score 3 - Xuất Sắc (Chuẩn ETS)';
-        feedback = 'Tuyệt vời! Câu của bạn sử dụng đầy đủ 2 từ khoá bắt buộc, đúng ngữ pháp và tuân thủ hoàn hảo quy chuẩn 1 câu của ETS.';
-      } else if (errors.length === 0 && warnings.length <= 2) {
-        score = 3;
-        label = 'Score 3 - Đạt Chuẩn ETS';
-        feedback = 'Câu đạt chuẩn điểm tối đa 3/3! Sử dụng đủ 2 từ khoá và diễn đạt rõ ràng.';
+        feedback = 'Tuyệt vời! Câu của bạn sử dụng đầy đủ 2 từ khoá bắt buộc, đúng ngữ pháp, chuẩn chính tả và tuân thủ hoàn hảo quy chuẩn 1 câu của ETS.';
+      } else if (errors.length === 0 && (warnings.length > 0 || hasStructIssue)) {
+        score = 2;
+        label = 'Score 2 - Khá Tốt';
+        feedback = 'Câu dùng đủ 2 từ khoá nhưng còn lỗi chính tả/dấu câu hoặc lặp từ cần sửa (viết hoa đầu câu, kết thúc bằng dấu chấm...) để đạt điểm tối đa.';
       } else if (errors.length <= 1) {
         score = 2;
         label = 'Score 2 - Khá Tốt';
-        feedback = 'Câu sử dụng đủ 2 từ khoá nhưng có lỗi ngữ pháp nhỏ cần lưu ý sửa đổi.';
+        feedback = 'Câu sử dụng đủ 2 từ khoá nhưng có lỗi ngữ pháp cần lưu ý sửa đổi (chủ ngữ rõ ràng / cấu trúc).';
       } else {
         score = 1;
         label = 'Score 1 - Cần Cải Thiện';
@@ -424,9 +451,16 @@
         detail: struct.isMultiSentence ? 'Viết nhiều hơn 1 câu riêng biệt' : 'Đúng chuẩn 1 câu đơn/ghép/phức'
       },
       {
+        name: 'Chủ ngữ rõ ràng (không mở đầu bằng đại từ mơ hồ)',
+        passed: antecedentCheck.passed,
+        detail: antecedentCheck.detail
+      },
+      {
         name: 'Đúng cấu trúc ngữ pháp & vị ngữ',
         passed: !grammarIssues.some(i => i.type === 'error'),
-        detail: grammarIssues.some(i => i.type === 'error') ? 'Có lỗi ngữ pháp/cấu trúc vị ngữ' : 'Ngữ pháp cơ bản chính xác'
+        detail: grammarIssues.some(i => i.type === 'error')
+          ? grammarIssues.filter(i => i.type === 'error').map(i => i.message).join(' ')
+          : 'Ngữ pháp cơ bản chính xác'
       },
       {
         name: 'Chính tả & Dấu câu chuẩn mực',
@@ -457,7 +491,8 @@
     tokenize,
     stem,
     checkKeywordMatch,
-    analyzeSentenceStructure
+    analyzeSentenceStructure,
+    checkClearAntecedent
   };
 
 })(typeof window !== 'undefined' ? window : this);

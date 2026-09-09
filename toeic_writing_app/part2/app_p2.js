@@ -324,8 +324,14 @@
     }
 
     if (el.clearAiConfigBtn) {
-      el.clearAiConfigBtn.addEventListener('click', () => {
-        if (confirm('Bạn có chắc muốn xoá API Key đã lưu?')) {
+      el.clearAiConfigBtn.addEventListener('click', async () => {
+        let ok = false;
+        if (window.ToeicUi) {
+          ok = await window.ToeicUi.confirm('Bạn có chắc muốn xoá API Key đã lưu?', { title: 'Xoá API Key', okText: 'Xoá', cancelText: 'Huỷ', danger: true });
+        } else {
+          ok = confirm('Bạn có chắc muốn xoá API Key đã lưu?');
+        }
+        if (ok) {
           window.ToeicP2LlmEvaluator.clearApiKey();
           if (el.aiApiKeyInput) el.aiApiKeyInput.value = '';
           showAiStatus('Đã xoá API Key.', 'info');
@@ -425,11 +431,16 @@
     if(!el.testSelect) return;
     el.testSelect.innerHTML = '';
 
+    const secCount = questions.filter(q => q.set === 'sec').length;
+    const coreCount = questions.filter(q => q.set === 'core').length;
+    const secTests = Math.ceil(secCount / 2);
+    const coreTests = Math.ceil(coreCount / 2);
+
     const secGroup = document.createElement('optgroup');
-    secGroup.label = 'Bộ Đề SEC (Question 6 & 7 - 5 Đề Thi Mới)';
+    secGroup.label = `Bộ Đề SEC (Question 6 & 7 - ${secTests} Đề Thi Mới)`;
 
     const coreGroup = document.createElement('optgroup');
-    coreGroup.label = 'Bộ 40 Đề Luyện Tập Chuẩn Hóa ETS (20 Đề Thi)';
+    coreGroup.label = `Bộ ${coreCount} Đề Luyện Tập Chuẩn Hóa ETS (${coreTests} Đề Thi)`;
 
     const totalTests = Math.ceil(questions.length / 2);
     for (let i = 0; i < totalTests; i++) {
@@ -442,7 +453,7 @@
       const opt = document.createElement('option');
       opt.value = i;
       
-      if (i < 5) {
+      if (i < secTests) {
         opt.textContent = `[SEC] Đề thi số ${String(i + 1).padStart(2, '0')} (Q6 & Q7)${topicStr}`;
         secGroup.appendChild(opt);
       } else {
@@ -451,8 +462,8 @@
       }
     }
 
-    el.testSelect.appendChild(secGroup);
-    el.testSelect.appendChild(coreGroup);
+    if (secCount > 0) el.testSelect.appendChild(secGroup);
+    if (coreCount > 0) el.testSelect.appendChild(coreGroup);
   }
 
   function startTest(testIdx) {
@@ -475,7 +486,11 @@
         updateTimerDisplay();
       } else {
         clearInterval(testTimerInterval);
-        alert('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.');
+        if (window.ToeicUi) {
+          window.ToeicUi.toast('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.', 'warning');
+        } else {
+          alert('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.');
+        }
         finalizeSubmitTest();
       }
     }, 1000);
@@ -808,12 +823,16 @@
     if(!el.practiceQuestionSelect) return;
     el.practiceQuestionSelect.innerHTML = '';
 
+    const secCount = questions.filter(q => q.set === 'sec').length;
+    const coreCount = questions.filter(q => q.set === 'core').length;
+
     const secGroup = document.createElement('optgroup');
-    secGroup.label = 'Bộ Đề SEC (10 Câu Mới)';
+    secGroup.label = `Bộ Đề SEC (${secCount} Câu Mới)`;
 
     const coreGroup = document.createElement('optgroup');
-    coreGroup.label = 'Bộ Đề Luyện Tập Cơ Bản (40 Câu)';
+    coreGroup.label = `Bộ Đề Luyện Tập Cơ Bản (${coreCount} Câu)`;
 
+    const totalLen = questions.length;
     questions.forEach((q, idx) => {
       const opt = document.createElement('option');
       opt.value = idx;
@@ -824,13 +843,13 @@
         opt.textContent = `[SEC ${String(q.sec_id || idx + 1).padStart(2, '0')}] Câu ${String(idx + 1).padStart(2, '0')} • [${cat}]${subj}`;
         secGroup.appendChild(opt);
       } else {
-        opt.textContent = `Câu ${String(idx + 1).padStart(2, '0')}/50 • [${cat}]${subj}`;
+        opt.textContent = `Câu ${String(idx + 1).padStart(2, '0')}/${totalLen} • [${cat}]${subj}`;
         coreGroup.appendChild(opt);
       }
     });
 
-    el.practiceQuestionSelect.appendChild(secGroup);
-    el.practiceQuestionSelect.appendChild(coreGroup);
+    if (secCount > 0) el.practiceQuestionSelect.appendChild(secGroup);
+    if (coreCount > 0) el.practiceQuestionSelect.appendChild(coreGroup);
   }
 
   function filterPracticeQuestions() {
@@ -862,10 +881,11 @@
     if(el.practiceQuestionSelect) el.practiceQuestionSelect.value = practiceActiveIndex;
     
     if(el.practiceQuestionBadge) {
+      const totalLen = questions.length;
       if (q.set === 'sec') {
-        el.practiceQuestionBadge.textContent = `Câu ${String(practiceActiveIndex + 1).padStart(2, '0')}/50 • ID #${q.id} [SEC ${String(q.sec_id || '').padStart(2, '0')}]`;
+        el.practiceQuestionBadge.textContent = `Câu ${String(practiceActiveIndex + 1).padStart(2, '0')}/${totalLen} • ID #${q.id} [SEC ${String(q.sec_id || '').padStart(2, '0')}]`;
       } else {
-        el.practiceQuestionBadge.textContent = `Câu ${String(practiceActiveIndex + 1).padStart(2, '0')}/50 • ID #${q.id}`;
+        el.practiceQuestionBadge.textContent = `Câu ${String(practiceActiveIndex + 1).padStart(2, '0')}/${totalLen} • ID #${q.id}`;
       }
     }
 
@@ -945,7 +965,11 @@
 
     const userResp = el.practiceTextarea ? el.practiceTextarea.value.trim() : '';
     if (!userResp) {
-      alert('Vui lòng viết email phản hồi của bạn trước khi chấm điểm!');
+      if (window.ToeicUi) {
+        window.ToeicUi.toast('Vui lòng viết email phản hồi của bạn trước khi chấm điểm!', 'warning');
+      } else {
+        alert('Vui lòng viết email phản hồi của bạn trước khi chấm điểm!');
+      }
       return;
     }
 
@@ -1086,7 +1110,11 @@
         if(el.testSelect) el.testSelect.value = testCurrentIndex + 1;
         startTest(testCurrentIndex + 1);
       } else {
-        alert('Đã hết bộ đề!');
+        if (window.ToeicUi) {
+          window.ToeicUi.toast('Đã hết bộ đề!', 'info');
+        } else {
+          alert('Đã hết bộ đề!');
+        }
       }
     });
 
@@ -1133,8 +1161,14 @@
       }
     });
     
-    if(el.clearPracticeBtn) el.clearPracticeBtn.addEventListener('click', () => {
-      if (confirm('Bạn có chắc muốn xoá nội dung đã nhập?')) {
+    if(el.clearPracticeBtn) el.clearPracticeBtn.addEventListener('click', async () => {
+      let ok = false;
+      if (window.ToeicUi) {
+        ok = await window.ToeicUi.confirm('Bạn có chắc muốn xoá nội dung đã nhập?', { title: 'Xoá nội dung', okText: 'Xoá', cancelText: 'Huỷ', danger: true });
+      } else {
+        ok = confirm('Bạn có chắc muốn xoá nội dung đã nhập?');
+      }
+      if (ok) {
         if(el.practiceTextarea) el.practiceTextarea.value = '';
         updatePracticeWritingStats();
         if(el.instantFeedbackBox) el.instantFeedbackBox.style.display = 'none';

@@ -453,7 +453,11 @@
         updateTimerDisplay();
       } else {
         clearInterval(testTimerInterval);
-        alert('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.');
+        if (window.ToeicUi) {
+          window.ToeicUi.toast('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.', 'warning');
+        } else {
+          alert('Hết giờ làm bài! Hệ thống tự động thu bài và chấm điểm.');
+        }
         finalizeSubmitTest();
       }
     }, 1000);
@@ -965,7 +969,11 @@
         const fallback = window.ToeicEvaluator.evaluate(userSentence, prompt, q);
         practiceEvaluations[q.id] = fallback;
         displayPracticeFeedback(fallback, prompt, q);
-        alert(`Không thể gọi Giám Khảo AI (${err.message}). Đã tự động dùng bộ chấm Offline.`);
+        if (window.ToeicUi) {
+          window.ToeicUi.toast('Không thể gọi Giám Khảo AI. Đã tự động dùng bộ chấm Offline.', 'error');
+        } else {
+          alert(`Không thể gọi Giám Khảo AI (${err.message}). Đã tự động dùng bộ chấm Offline.`);
+        }
       } finally {
         el.checkAnswerBtn.innerHTML = origHtml;
         el.checkAnswerBtn.disabled = false;

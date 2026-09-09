@@ -33,6 +33,15 @@
                 return result;
             }
 
+            // Rubric Score 0: not written in English / gibberish (few real letters)
+            const alphaChars = (text.match(/[a-zA-Z]/g) || []).length;
+            const latinRatio = text.length > 0 ? alphaChars / text.length : 0;
+            if (latinRatio < 0.5 || alphaChars < 30) {
+                result.feedback.push({ type: 'error', icon: '', text: 'Bài viết không phải tiếng Anh hoặc chứa ký tự không hợp lệ (rubric Score 0).' });
+                this._setScore(result, 0);
+                return result;
+            }
+
             // Simple plagiarism check (copying prompt)
             const promptText = question && question.email ? question.email.body : '';
             if (promptText && promptText.length > 20) {
@@ -40,6 +49,17 @@
                 const cleanedPrompt = promptText.toLowerCase().replace(/[^a-z0-9]/g, '');
                 if (cleanedPrompt.includes(cleanedResponse) && cleanedResponse.length > 50) {
                     result.feedback.push({ type: 'error', icon: '', text: 'Bài viết sao chép từ đề bài.' });
+                    this._setScore(result, 0);
+                    return result;
+                }
+            }
+
+            // Rubric Score 0/1: content is off-topic (does not address the email at all)
+            if (promptText && promptText.length > 20) {
+                const pWords = promptText.toLowerCase().replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(w => w.length > 3);
+                const topicHits = pWords.filter(w => text.toLowerCase().includes(w)).length;
+                if (topicHits === 0) {
+                    result.feedback.push({ type: 'error', icon: '', text: 'Bài viết không liên quan đến nội dung email/đề bài (rubric Score 0-1).' });
                     this._setScore(result, 0);
                     return result;
                 }

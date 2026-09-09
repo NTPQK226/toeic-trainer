@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Writing Part 3 - Viết Bài Luận (Opinion Essay) | Chuẩn ETS</title>
+  <meta name="description" content="Luyện thi TOEIC Writing Part 3 - Question 8: Write an Opinion Essay. Chấm điểm AI Gemini thang 0-5, thi thử 30 phút chuẩn ETS.">
+  <link rel="stylesheet" href="styles_p3.css">
+</head>
+<body>
+
+  <!-- ====================================================================
+       TOP APP HEADER
+       ==================================================================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-wrapper">
+        <div class="brand-icon">T3</div>
+        <div class="brand-text">
+          <h1>TOEIC WRITING PART 3</h1>
+          <span>Viết Bài Luận • Chuẩn Khảo Thí ETS (Question 8)</span>
+        </div>
+      </div>
+
+      <!-- Part Switcher (3 parts) -->
+      <nav class="part-switcher" aria-label="TOEIC Writing Parts">
+        <a href="../index.html" class="part-tab" title="Part 1: Photos (Questions 1–5)">
+          <span class="part-pill">Part 1</span>
+          <span class="part-name">Photos</span>
+        </a>
+        <a href="../part2/index.html" class="part-tab" title="Part 2: Email (Questions 6–7)">
+          <span class="part-pill">Part 2</span>
+          <span class="part-name">Email</span>
+        </a>
+        <a href="./index.html" class="part-tab active" title="Part 3: Essay (Question 8)">
+          <span class="part-pill">Part 3</span>
+          <span class="part-name">Essay</span>
+        </a>
+      </nav>
+
+      <!-- Mode Switcher -->
+      <nav class="mode-switcher" aria-label="Chế độ làm bài">
+        <button id="modeFullBtn" class="mode-btn active" data-mode="full">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Thi Thử 1 Bài (30p)</span>
+        </button>
+        <button id="modePracticeBtn" class="mode-btn" data-mode="practice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Luyện Viết</span>
+        </button>
+      </nav>
+
+      <!-- Action buttons -->
+      <div class="header-actions">
+        <button id="aiConfigBtn" class="btn-icon" title="Cấu hình Giám Khảo AI (Gemini LLM)" aria-label="Cấu hình AI">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg>
+        </button>
+        <button id="rubricBtn" class="btn-icon" title="Thang điểm ETS Part 3 (Rubric 0-5)" aria-label="Thang điểm ETS">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        </button>
+        <button id="tipsBtn" class="btn-icon" title="Bí kíp viết bài luận Part 3" aria-label="Bí kíp viết bài luận">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path></svg>
+        </button>
+        <button id="themeToggleBtn" class="btn-icon" title="Chuyển Giao Diện Sáng / Tối" aria-label="Chuyển giao diện">
+          <svg id="themeToggleIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       MAIN CONTENT
+       ==================================================================== -->
+  <main class="app-main">
+    <div class="container">
+
+      <!-- ================================================================
+           TAB 1: FULL TEST SIMULATION (Q8 - 30 phút)
+           ================================================================ -->
+      <section id="fullTestTab" class="tab-content active">
+        <div class="test-select-bar">
+          <div class="test-select-group">
+            <label for="testSelect" style="font-weight: 700; font-size: 0.84rem; white-space: nowrap;">Chọn đề luận:</label>
+            <select id="testSelect" class="custom-select" style="min-width: 240px;"></select>
+            <button id="startTestBtn" class="btn btn-primary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem; white-space: nowrap;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>Bắt Đầu Bài Thi</span>
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+            <button id="aiToggleSwitchFull" class="ai-toggle-switch" title="Bật/Tắt chấm bằng AI Gemini">
+              <span>AI:</span>
+              <strong id="aiStatusTextFull">OFF</strong>
+            </button>
+            <div id="timerWidget" class="timer-widget">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="timerText">30:00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-Progress Workspace -->
+        <div id="testActiveWorkspace">
+          <div class="test-grid">
+            <!-- Left: Prompt Card -->
+            <div class="prompt-viewer-card">
+              <div class="prompt-header">
+                <span id="testQuestionBadge" class="essay-badge">Question 8 • Opinion Essay</span>
+                <span id="testCategoryBadge" class="task-badge">Chủ đề</span>
+              </div>
+              <div class="prompt-scroll">
+                <div class="prompt-label">Đề bài (Writing Prompt)</div>
+                <p id="testPromptText" class="prompt-text">Đang tải đề bài...</p>
+                <div class="prompt-vi-box">
+                  <strong>Bản dịch tham khảo:</strong>
+                  <p id="testPromptViText"></p>
+                </div>
+                <div class="word-target-box">
+                  <strong>Mục tiêu:</strong> Bài luận hiệu quả thường có <strong>tối thiểu 300 từ</strong>, gồm mở bài – thân bài – kết luận.
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Essay Editor -->
+            <div class="essay-card">
+              <div class="essay-card-header">
+                <div class="essay-title">
+                  <span>Bài Luận Của Bạn</span>
+                </div>
+                <div class="word-count-pills">
+                  <div class="count-pill"><strong id="testWordCount">0</strong> từ</div>
+                  <div class="count-pill"><strong id="testParagraphCount">0</strong> đoạn</div>
+                  <div class="count-pill"><strong id="testSentenceCount">0</strong> câu</div>
+                </div>
+              </div>
+              <textarea
+                id="testTextarea"
+                class="essay-textarea"
+                placeholder="Viết bài luận của bạn tại đây... (Đạt chuẩn tối thiểu 300 từ để nhận điểm tối đa Score 5/5)&#10;&#10;In recent years, ...&#10;&#10;In my opinion, ...&#10;&#10;First of all, ...&#10;Furthermore, ...&#10;Finally, ...&#10;&#10;In conclusion, ..."
+                spellcheck="true"
+              ></textarea>
+              <div style="padding: 0.5rem 0.75rem; background: var(--bg-subtle); border-top: 1px solid var(--border-color);">
+                <button id="testSubmitBtn" class="btn btn-primary" style="width: 100%; padding: 0.5rem 1rem; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.4rem;" title="Nộp bài và chấm điểm (Ctrl + Enter)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><path d="M22 2 11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  <span>NỘP BÀI & CHẤM ĐIỂM (Ctrl + Enter)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full Test Report View -->
+        <div id="testReportView" style="display: none;">
+          <div class="report-card">
+            <div class="report-header">
+              <div class="report-score-circle">
+                <span id="reportScoreNumber">0 / 5</span>
+              </div>
+              <span id="reportBadge" class="score-badge"></span>
+              <p id="reportSummaryText" style="margin-top: 0.75rem; font-size: 1.05rem; color: var(--text-muted);"></p>
+            </div>
+            <div id="reportCriteria" class="report-criteria"></div>
+            <div id="reportMessages" class="report-messages"></div>
+            <div id="reportImprovedBox" class="improved-version-box" style="display:none;">
+              <h4>Gợi Ý Viết Lại Chuẩn Điểm 5 (Giám khảo AI):</h4>
+              <div id="reportImprovedText" class="improved-text"></div>
+            </div>
+            <div class="report-actions">
+              <button id="reportRetakeBtn" class="btn btn-outline">
+                <span>Làm Lại Đề Này</span>
+              </button>
+              <button id="reportNextTestBtn" class="btn btn-primary">
+                <span>Sang Đề Tiếp Theo</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 2: PRACTICE MODE (Luyện viết)
+           ================================================================ -->
+      <section id="practiceTab" class="tab-content">
+        <div class="practice-controls-bar">
+          <div class="practice-filter-group">
+            <label for="practiceCategoryFilter" style="font-weight: 700; font-size: 0.88rem;">Chủ đề:</label>
+            <select id="practiceCategoryFilter" class="custom-select"></select>
+            <label for="practiceQuestionSelect" style="font-weight: 700; font-size: 0.88rem;">Chọn đề:</label>
+            <select id="practiceQuestionSelect" class="custom-select" style="flex: 1; min-width: 240px; max-width: 380px;"></select>
+            <button id="practiceRandomBtn" class="btn btn-outline" title="Chọn ngẫu nhiên 1 đề">
+              <span>Ngẫu nhiên</span>
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button id="aiToggleSwitch" class="ai-toggle-switch" title="Bật/Tắt chấm bằng AI Gemini">
+              <span>AI:</span>
+              <strong id="aiStatusText">OFF</strong>
+            </button>
+          </div>
+        </div>
+
+        <div class="practice-grid">
+          <!-- Left: Prompt -->
+          <div class="prompt-viewer-card">
+            <div class="prompt-header">
+              <span id="practiceQuestionBadge" class="essay-badge">Question 8</span>
+              <span id="practiceCategoryBadge" class="task-badge">Chủ đề</span>
+            </div>
+            <div class="prompt-scroll">
+              <div class="prompt-label">Đề bài (Writing Prompt)</div>
+              <p id="practicePromptText" class="prompt-text"></p>
+              <div class="prompt-vi-box">
+                <strong>Bản dịch tham khảo:</strong>
+                <p id="practicePromptViText"></p>
+              </div>
+              <div class="word-target-box">
+                <strong>Mục tiêu:</strong> tối thiểu <strong>300 từ</strong>, mở bài – thân bài – kết luận.
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Editor & Feedback -->
+          <div class="essay-card">
+            <div class="essay-card-header">
+              <div class="essay-title"><span>Bài Luận Của Bạn</span></div>
+              <div class="word-count-pills">
+                <div class="count-pill"><strong id="practiceWordCount">0</strong> từ</div>
+                <div class="count-pill"><strong id="practiceParagraphCount">0</strong> đoạn</div>
+                <div class="count-pill"><strong id="practiceSentenceCount">0</strong> câu</div>
+              </div>
+            </div>
+            <textarea id="practiceTextarea" class="essay-textarea" placeholder="Viết bài luận của bạn tại đây... (300+ từ cho Score 5/5)" spellcheck="true"></textarea>
+            <div class="practice-actions-row" style="display: flex; gap: 0.35rem; align-items: center; justify-content: space-between; width: 100%; flex-wrap: nowrap; padding: 0.5rem 0.75rem; background: var(--bg-subtle); border-top: 1px solid var(--border-color);">
+              <div style="display: flex; gap: 0.35rem; align-items: center; flex: 1; min-width: 0; flex-wrap: wrap;">
+                <button id="checkAnswerBtn" class="btn btn-primary" style="font-size: 0.82rem; padding: 0.4rem 0.7rem;" title="Chấm bài luận ngay (Ctrl + Enter)">
+                  <span>Chấm Điểm (Ctrl+Enter)</span>
+                </button>
+                <button id="showAnswerBtn" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.4rem 0.7rem;" title="Xem bài mẫu chuẩn Score 5">
+                  <span>Xem Bài Mẫu</span>
+                </button>
+                <button id="clearPracticeBtn" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.4rem 0.55rem;" title="Xoá nội dung để viết lại">
+                  <span>Xoá</span>
+                </button>
+              </div>
+              <div style="display: flex; gap: 0.3rem; align-items: center; flex-shrink: 0;">
+                <button id="practicePrevBtn" class="btn btn-outline btn-nav-icon" style="width: 36px; height: 36px; min-width: 36px;" title="Đề trước">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button id="practiceNextBtn" class="btn btn-outline btn-nav-icon" style="width: 36px; height: 36px; min-width: 36px;" title="Đề sau">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Instant Feedback -->
+            <div id="instantFeedbackBox" class="feedback-box" style="display:none;">
+              <div class="feedback-header">
+                <span id="feedbackScoreBadge" class="score-badge"></span>
+                <span id="feedbackLabel" style="font-weight:700; font-size:1rem;"></span>
+              </div>
+              <div id="feedbackStats" class="feedback-stats"></div>
+              <ul id="feedbackCriteria" class="criteria-list"></ul>
+              <div id="feedbackMessages" class="feedback-messages"></div>
+              <div id="feedbackImprovedBox" class="improved-version-box" style="display:none;">
+                <h4>Gợi Ý Viết Lại Chuẩn Điểm 5 (Giám khảo AI):</h4>
+                <div id="feedbackImprovedText" class="improved-text"></div>
+              </div>
+              <div id="feedbackSampleBox" class="sample-answer-box" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <strong>BÀI MẪU SCORE 5 THAM KHẢO:</strong>
+                  <button id="toggleSampleBtn" class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.78rem;">Ẩn/Hiện</button>
+                </div>
+                <div id="feedbackSampleText" class="sample-text" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <p>TOEIC Writing Part 3 • Opinion Essay (Question 8) Chuẩn Khảo Thí ETS • Hỗ trợ Giám khảo AI Gemini 2026</p>
+  </footer>
+
+  <!-- ====================================================================
+       MODAL 1: ETS PART 3 SCORING RUBRIC (0-5)
+       ==================================================================== -->
+  <div id="rubricModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Thang Điểm & Tiêu Chí ETS Part 3 (0–5)</h3>
+        <button class="close-btn" data-close="rubricModal">&times;</button>
+      </div>
+      <div>
+        <table class="rubric-table">
+          <thead>
+            <tr><th style="width:100px;">Thang Điểm</th><th>Tiêu Chí Đánh Giá (Chuẩn Khảo Thí)</th></tr>
+          </thead>
+          <tbody>
+            <tr class="rubric-5"><td>Score 5<br><small>(Xuất sắc)</small></td><td>Bài luận đầy đủ & phát triển tốt; tổ chức mạch lạc, có tính thống nhất & tiến triển; tiếng Anh tự nhiên; đa dạng cấu trúc câu; từ vựng chính xác; ngữ pháp chuẩn; thường 300+ từ.</td></tr>
+            <tr class="rubric-4"><td>Score 4<br><small>(Tốt)</small></td><td>Quan điểm rõ ràng, lý do/ví dụ phát triển, bố cục tốt; chỉ có vài sai sót nhỏ về ngôn ngữ/liên kết.</td></tr>
+            <tr class="rubric-3"><td>Score 3<br><small>(Khá)</small></td><td>Có quan điểm + một số lý do nhưng chưa phát triển đầy đủ, lặp ý, ngắn (~250-290 từ), hoặc bố cục/ngữ pháp còn yếu rõ.</td></tr>
+            <tr class="rubric-2"><td>Score 2<br><small>(Cần cải thiện)</small></td><td>Hỗ trợ/hạn chế phát triển, thiếu tổ chức, hoặc lỗi ngữ pháp nghiêm trọng & thường xuyên.</td></tr>
+            <tr class="rubric-1"><td>Score 1<br><small>(Yếu)</small></td><td>Nội dung rất hạn chế, ít liên quan, chủ yếu ý không có dẫn chứng; lỗi ngữ pháp nghiêm trọng.</td></tr>
+            <tr class="rubric-0"><td>Score 0<br><small>(Chưa đạt)</small></td><td>Bỏ trống, lạc đề, sao chép đề, không viết tiếng Anh, hoặc gõ linh tinh.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: TIPS
+       ==================================================================== -->
+  <div id="tipsModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 620px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Bí Kíp Viết Bài Luận Điểm 5/5</h3>
+        <button class="close-btn" data-close="tipsModal">&times;</button>
+      </div>
+      <div style="font-size: 0.92rem; line-height: 1.65;">
+        <h4 style="color: var(--primary); margin-bottom: 0.4rem;">1. Cấu trúc 4 đoạn vàng:</h4>
+        <ul style="margin-left: 1.25rem; margin-bottom: 0.85rem;">
+          <li><strong>Mở bài:</strong> Giới thiệu chủ đề + nêu rõ quan điểm (thesis).</li>
+          <li><strong>Thân bài 1:</strong> Luận điểm 1 + ví dụ cụ thể.</li>
+          <li><strong>Thân bài 2:</strong> Luận điểm 2 + ví dụ cụ thể (nên có 2–3 luận điểm).</li>
+          <li><strong>Kết luận:</strong> Tóm tắt & khẳng định lại quan điểm.</li>
+        </ul>
+        <h4 style="color: var(--primary); margin-bottom: 0.4rem;">2. Dùng từ nối & câu đa dạng:</h4>
+        <ul style="margin-left: 1.25rem; margin-bottom: 0.85rem;">
+          <li>Từ nối: <em>First of all, Furthermore, However, In conclusion...</em></li>
+          <li>Đan xen câu đơn – câu ghép – câu phức; câu chủ đề rõ ở đầu mỗi đoạn.</li>
+        </ul>
+        <h4 style="color: var(--primary); margin-bottom: 0.4rem;">3. Độ dài & thời gian:</h4>
+        <p>Viết <strong>≥ 300 từ</strong>. 30 phút: 3 phút lập dàn ý, 22 phút viết, 5 phút soát lỗi.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: SUBMIT CONFIRMATION
+       ==================================================================== -->
+  <div id="submitModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Xác Nhận Nộp Bài Thi</h3>
+        <button class="close-btn" data-close="submitModal">&times;</button>
+      </div>
+      <p id="submitWarningText" style="margin-bottom: 1rem; color: var(--text-muted); font-size:0.95rem;"></p>
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+        <button id="cancelSubmitBtn" class="btn btn-outline">Quay Lại Làm Tiếp</button>
+        <button id="confirmSubmitBtn" class="btn btn-primary">Đồng Ý Nộp Bài</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 4: GEMINI AI CONFIG
+       ==================================================================== -->
+  <div id="aiConfigModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Cấu Hình Giám Khảo AI (Google Gemini)</h3>
+        <button class="close-btn" data-close="aiConfigModal">&times;</button>
+      </div>
+      <div style="font-size:0.92rem; line-height:1.6;">
+        <p style="color:var(--text-muted); margin-bottom:0.85rem;">Kết nối Gemini để chấm bài luận thang 0–5 với nhận xét chi tiết & bài viết lại chuẩn bản xứ. Key chỉ lưu trong trình duyệt của bạn.</p>
+        <div style="margin-bottom:1rem;">
+          <label for="aiApiKeyInput" style="display:block; font-weight:700; margin-bottom:0.35rem;">Google Gemini API Key:</label>
+          <input type="password" id="aiApiKeyInput" class="custom-select" style="width:100%; font-family:monospace; font-size:0.9rem;" placeholder="Dán API key Google Gemini...">
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.35rem;">Nhận key miễn phí tại: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--primary); font-weight:600;">Google AI Studio</a></div>
+        </div>
+        <div style="margin-bottom:1.25rem;">
+          <label for="aiModelSelect" style="display:block; font-weight:700; margin-bottom:0.35rem;">Mô hình AI:</label>
+          <select id="aiModelSelect" class="custom-select" style="width:100%;">
+            <option value="gemini-flash-lite-latest" selected>Gemini Flash-Lite Latest (Nhanh & Ổn định)</option>
+            <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option>
+            <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:0.6rem; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+          <div style="display:flex; gap:0.5rem;">
+            <button id="saveAiConfigBtn" class="btn btn-primary">Lưu & Bật AI</button>
+            <button id="testAiConfigBtn" class="btn btn-outline">Kiểm Tra Kết Nối</button>
+          </div>
+          <button id="clearAiConfigBtn" class="btn btn-outline" style="color:var(--danger); border-color:rgba(239,68,68,0.4);">Xoá Key</button>
+        </div>
+        <div id="aiTestStatus" style="margin-top:1rem; display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="part3_data.js"></script>
+  <script src="evaluator_p3.js"></script>
+  <script src="llm_evaluator_p3.js"></script>
+  <script src="custom_select.js"></script>
+  <script src="ui_feedback.js"></script>
+  <script src="app_p3.js"></script>
+</body>
+</html>

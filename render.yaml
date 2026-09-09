@@ -1,0 +1,46 @@
+# ============================================================================
+# Render Blueprint — TOEIC Trainer (Static Site)
+# ----------------------------------------------------------------------------
+# App là web tĩnh thuần (không framework/build step). Render serve trực tiếp
+# thư mục toeic_writing_app/ làm root qua CDN toàn cầu, miễn phí.
+#   /         → Part 1 (index.html)
+#   /part2/   → Part 2
+#   /part3/   → Part 3
+# Auto-deploy mỗi khi push lên branch main (repo công khai đã bật).
+# Cách dùng:
+#   1. Vào https://dashboard.render.com → New → Blueprint
+#   2. Chọn repo GitHub NTPQK226/toeic-trainer
+#   3. Render đọc render.yaml này và tạo static site. Xong.
+# ============================================================================
+
+services:
+  - type: web
+    name: toeic-trainer
+    runtime: static
+    repo: https://github.com/NTPQK226/toeic-trainer
+    branch: main
+    # Không có build step — chỉ cần publish folder app.
+    buildCommand: echo "Static site - no build step"
+    staticPublishPath: ./toeic_writing_app
+
+    # Redirect HTTP → HTTPS + cache ảnh lâu dài (do Render/headers đảm nhiệm)
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /images/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+
+    routes:
+      # Nếu ai đó truy cập đường dẫn cũ kiểu Netlify (có toeic_writing_app/...)
+      - type: redirect
+        source: /toeic_writing_app/*
+        destination: /:splat
+        status: 301

@@ -1,9 +1,14 @@
 # Kế Hoạch Deploy — TOEIC Trainer (Free & Nhanh)
 
-**Repo:** `NTPQK226/toeic-trainer` (private)
-**Netlify project (đã có sẵn):** `toeictraining` → `https://toeictraining.netlify.app`
-**Site ID:** `734e3d40-895f-467f-ad61-10c2f2da177a`
-**Kiến trúc:** static site thuần (không build step, không framework). **Publish dir = `toeic_writing_app/`**.
+**Repo:** `NTPQK226/toeic-trainer` (public)
+**Kiến trúc:** static site thuần (không build step, không framework). **Publish dir = `toeic_writing_app/`** (root: Part 1, `/part2/`, `/part3/`).
+
+**2 nền tảng hỗ trợ (đều miễn phí):**
+
+| Nền tảng | URL | Trạng thái |
+|---|---|---|
+| **Netlify** | `https://toeictraining.netlify.app` (Site ID `734e3d40-895f-467f-ad61-10c2f2da177a`) | Đang chạy |
+| **Render** (xem mục 6) | `https://toeic-trainer.onrender.com` | Sẵn sàng qua `render.yaml` |
 
 ---
 
@@ -14,7 +19,7 @@
 
 Khi drop đúng folder `toeic_writing_app`:
 - `/` → Part 1 (code mới, 155 câu + Part switcher)
-- `/part2/` → Part 2 (50 đề email)
+- `/part2/` → Part 2 (30 đề email)
 - Không còn file PDF nào trên web.
 
 ---
@@ -77,23 +82,67 @@ npx netlify-cli deploy --prod --dir=. --site 734e3d40-895f-467f-ad61-10c2f2da177
 
 ---
 
-## 6. Đổi nền tảng sau này (nếu muốn)
+## 6. Deploy bằng Render (Static Site — thêm, miễn phí)
 
-| Nền tảng | CI/CD | Chi phí | Ghi chú |
-|---|---|---|---|
-| **Netlify** (đang dùng) | GitHub Actions | Free | Đã có `_headers`/`netlify.toml` |
-| Cloudflare Pages | GitHub Actions | Free | Cực nhanh toàn cầu |
-| GitHub Pages | Actions | Free | Site public dù repo private |
-| Vercel | GitHub Actions | Free | Tốt nếu thêm framework sau |
+App là **static thuần** nên Render serve thẳng qua CDN, không cần build — **free** (kèm hạn mức băng thông/pipline theo Hobby plan). File cấu hình đã có sẵn: **`render.yaml`** ở gốc repo.
 
-> Đổi nền tảng chỉ cần đổi workflow — source không đổi (static site).
+```yaml
+services:
+  - type: web
+    name: toeic-trainer
+    runtime: static
+    repo: https://github.com/NTPQK226/toeic-trainer
+    branch: main
+    buildCommand: echo "Static site - no build step"
+    staticPublishPath: ./toeic_writing_app
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      # ... (thêm X-Content-Type-Options, cache ảnh...)
+    routes:
+      - type: redirect
+        source: /toeic_writing_app/*
+        destination: /:splat
+        status: 301
+```
+
+### Cấu hình 1 lần (~2 phút)
+1. Vào <https://dashboard.render.com> → đăng ký bằng GitHub (cho phép truy cập repo `toeic-trainer`).
+2. **New → Blueprint** → chọn repo `NTPQK226/toeic-trainer`.
+3. Render đọc `render.yaml` → tạo static site `toeic-trainer` → URL: `https://toeic-trainer.onrender.com`.
+4. Mỗi lần **push lên `main`** Render tự deploy lại (atomic, cache invalidation tự động).
+
+### Kết quả sau khi deploy
+- `https://toeic-trainer.onrender.com/` → Part 1
+- `https://toeic-trainer.onrender.com/part2/` → Part 2
+- `https://toeic-trainer.onrender.com/part3/` → Part 3
+- Tài liệu PDF không bao giờ được publish (folder gốc không nằm trong `staticPublishPath`).
+
+> **Static hay full web?** — Dùng **Static** là đúng & tối ưu cho app này (không có server/DB). "Full web" (web service) chỉ cần nếu sau này thêm backend/API. Không cần thiết ở đây.
 
 ---
 
-## 7. Việc cần làm
+## 7. Đổi nền tảng sau này (nếu muốn)
 
-- [x] Dọn PDF khỏi bản deploy (chỉ drop `toeic_writing_app`)
+| Nền tảng | CI/CD | Chi phí | Ghi chú |
+|---|---|---|---|
+| **Netlify** (đang chạy) | GitHub Actions / Drop | Free | `_headers` + `netlify.toml` |
+| **Render** (đã thêm) | Tự động qua `render.yaml` | Free | Static site CDN, URL `onrender.com` |
+| Cloudflare Pages | GitHub Actions | Free | Cực nhanh toàn cầu |
+| GitHub Pages | Actions | Free | Chỉ site public |
+| Vercel | GitHub Actions | Free | Tốt nếu thêm framework sau |
+
+> Đổi nền tảng chỉ cần đổi workflow/config — source không đổi (static site).
+
+---
+
+## 8. Việc cần làm
+
+- [x] Dọn PDF khỏi bản deploy (chỉ publish `toeic_writing_app`)
 - [x] Xoá `_redirects` catch-all gây lỗi `/part2/`
-- [x] Thêm `_headers` (bảo mật + cache) — Drop-friendly
-- [x] Workflow CI/CD trỏ đúng Site ID `734e3d40-...`
-- [ ] **(Bạn thao tác)** Drop folder `toeic_writing_app` vào project `toeictraining` (Cách 1) — hoặc thêm 2 secrets + push để chạy CI/CD (Cách 2)
+- [x] Thêm `_headers` (bảo mật + cache)
+- [x] Workflow CI/CD Netlify trỏ đúng Site ID `734e3d40-...`
+- [x] Thêm `render.yaml` (Render static site)
+- [ ] **(Bạn thao tác)** Push lên `main` → GitHub Actions tự deploy Netlify
+- [ ] **(Bạn thao tác)** Tạo Blueprint trên Render (mục 6) nếu muốn dùng thêm Render

@@ -20,16 +20,18 @@
       </a>
 
       <!-- Top Bar Part Switcher -->
-      <nav class="part-switcher" aria-label="Chọn phần thi TOEIC Writing">
-        <a href="./index.html" class="part-tab active" title="Đang ở Part 1: Mô Tả Tranh">
+      <nav class="part-switcher" aria-label="TOEIC Writing Parts">
+        <a href="./index.html" class="part-tab active" title="Part 1: Photos (Questions 1–5)">
           <span class="part-pill">Part 1</span>
-          <span class="part-name">Mô Tả Tranh</span>
-          <span class="part-count">155 câu</span>
+          <span class="part-name">Photos</span>
         </a>
-        <a href="./part2/index.html" class="part-tab" title="Chuyển sang Part 2: Viết Email">
+        <a href="./part2/index.html" class="part-tab" title="Part 2: Email (Questions 6–7)">
           <span class="part-pill">Part 2</span>
-          <span class="part-name">Viết Email</span>
-          <span class="part-count">50 đề</span>
+          <span class="part-name">Email</span>
+        </a>
+        <a href="./part3/index.html" class="part-tab" title="Part 3: Essay (Question 8)">
+          <span class="part-pill">Part 3</span>
+          <span class="part-name">Essay</span>
         </a>
       </nav>
 
@@ -86,7 +88,7 @@
             <button id="aiToggleSwitchFull" class="ai-toggle-switch" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; white-space: nowrap;" title="Bật/Tắt chế độ chấm thi bằng AI Gemini cho bài thi thử">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
               <span>AI:</span>
-              <strong id="aiStatusTextFull" style="color: var(--text-muted);">OFF</strong>
+              <strong id="aiStatusTextFull">OFF</strong>
             </button>
 
             <!-- Countdown Timer Widget -->
@@ -171,7 +173,7 @@
 
               <!-- Test Submit Button inside Right Card -->
               <div>
-                <button id="testSubmitBtn" class="btn btn-success" style="width: 100%; padding: 0.45rem 1rem; font-size: 0.86rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.4rem;" title="Nộp bài và chấm điểm (Ctrl + Enter)">
+                <button id="testSubmitBtn" class="btn btn-primary" style="width: 100%; padding: 0.5rem 1rem; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.4rem;" title="Nộp bài và chấm điểm (Ctrl + Enter)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                   <span>NỘP BÀI CHẤM ĐIỂM (Ctrl + Enter)</span>
                 </button>
@@ -252,7 +254,7 @@
             <button id="aiToggleSwitch" class="ai-toggle-switch" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; white-space: nowrap;" title="Bật/Tắt chế độ chấm bằng AI Gemini">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
               <span>AI:</span>
-              <strong id="aiStatusText" style="color: var(--text-muted);">OFF</strong>
+              <strong id="aiStatusText">OFF</strong>
             </button>
           </div>
         </div>
@@ -465,20 +467,27 @@
             <strong>1. Luôn viết duy nhất 1 câu:</strong><br>
             Bắt đầu bằng chữ in hoa và kết thúc bằng dấu chấm câu. Tuyệt đối không viết 2 câu riêng biệt. Nếu cần nối ý, dùng liên từ (<em>and, but, while, because, so</em>) hoặc mệnh đề quan hệ (<em>who, which</em>).
           </li>
+          <li style="background: var(--danger-light); border-left: 4px solid var(--danger); padding: 0.6rem 0.85rem; border-radius: var(--radius-md);">
+            <strong>2. Nêu rõ chủ thể — KHÔNG mở đầu bằng đại từ mơ hồ:</strong><br>
+            Trước khi dùng <em>they / she / he / we / you</em>, bạn PHẢI nêu danh từ chỉ người/vật trong tranh (vd: <strong>The women, Two men, A customer</strong>).<br>
+            <span style="color: var(--danger); font-weight: 700;">[Sai]</span> <em>"They are choosing some merchandise."</em> — Giám khảo không biết "they" là ai.<br>
+            <span style="color: var(--success); font-weight: 700;">[Đúng]</span> <em>"The women are choosing some merchandise."</em><br>
+            Đại từ chỉ được dùng để thay thế cho danh từ <strong>đã nhắc đến trước đó</strong> trong câu.
+          </li>
           <li>
-            <strong>2. Tranh có Người (People):</strong><br>
+            <strong>3. Tranh có Người (People):</strong><br>
             Ưu tiên thì <strong>Hiện Tại Tiếp Diễn (S + is/are + V-ing)</strong> để miêu tả hành động đang diễn ra của người trong ảnh.
           </li>
           <li>
-            <strong>3. Tranh Vật & Cảnh (Objects & Scenery):</strong><br>
+            <strong>4. Tranh Vật & Cảnh (Objects & Scenery):</strong><br>
             Ưu tiên <strong>Thể Bị Động (S + is/are + V3/ed hoặc has/have been + V3/ed)</strong> hoặc cấu trúc tồn tại (<em>There is/are...</em>) để miêu tả sự sắp đặt của đồ vật.
           </li>
           <li>
-            <strong>4. Linh hoạt biến đổi từ khoá:</strong><br>
+            <strong>5. Linh hoạt biến đổi từ khoá:</strong><br>
             ETS cho phép đổi dạng từ: chia thì (<em>shop &rarr; is shopping</em>), chuyển số nhiều (<em>woman &rarr; women</em>), dạng danh động từ.
           </li>
           <li>
-            <strong>5. Giữ câu ngắn gọn, rõ nghĩa:</strong><br>
+            <strong>6. Giữ câu ngắn gọn, rõ nghĩa:</strong><br>
             Độ dài lý tưởng là từ 8 đến 18 từ. Không viết lan man để tránh sinh ra lỗi ngữ pháp không đáng có.
           </li>
         </ol>
@@ -505,7 +514,7 @@
         <button id="cancelSubmitBtn" class="btn btn-outline">
           Quay lại làm tiếp
         </button>
-        <button id="confirmSubmitBtn" class="btn btn-success">
+        <button id="confirmSubmitBtn" class="btn btn-primary">
           Đồng Ý Nộp Bài
         </button>
       </div>
@@ -584,6 +593,7 @@
   <script src="evaluator.js"></script>
   <script src="llm_evaluator.js"></script>
   <script src="custom_select.js"></script>
+  <script src="ui_feedback.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
