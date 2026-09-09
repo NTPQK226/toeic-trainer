@@ -667,20 +667,14 @@ body.ui-confirm-open { overflow: hidden; }
 }
 
 /* ==========================================================================
-   FLOATING AI ASSISTANT SPEED-DIAL & MODAL
+   FLOATING AI ASSISTANT BUTTON & MODAL
    ========================================================================== */
 
-.floating-ai-widget {
+.floating-ai-btn {
   position: fixed;
   bottom: 74px;
   right: 24px;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.floating-ai-main-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -697,89 +691,14 @@ body.ui-confirm-open { overflow: hidden; }
   user-select: none;
 }
 
-.floating-ai-main-btn:hover {
-  transform: translateY(-2px) scale(1.02);
+.floating-ai-btn:hover {
+  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(168, 85, 247, 0.55);
   filter: brightness(1.1);
 }
 
-.floating-ai-main-btn:active {
+.floating-ai-btn:active {
   transform: translateY(0);
-}
-
-.ai-speed-dial-menu {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  margin-bottom: 10px;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(12px) scale(0.95);
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.floating-ai-widget:hover .ai-speed-dial-menu,
-.floating-ai-widget:focus-within .ai-speed-dial-menu,
-.floating-ai-widget.open .ai-speed-dial-menu {
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.ai-speed-dial-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
-}
-
-.ai-speed-dial-btn:hover {
-  transform: scale(1.12);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-.ai-speed-dial-btn.gemini-btn {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-}
-
-.ai-speed-dial-btn.chatgpt-btn {
-  background: linear-gradient(135deg, #059669, #10a37f);
-}
-
-.ai-speed-dial-btn.claude-btn {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-}
-
-.ai-speed-dial-tooltip {
-  position: absolute;
-  right: calc(100% + 10px);
-  white-space: nowrap;
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 0.78rem;
-  font-weight: 700;
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.ai-speed-dial-btn:hover .ai-speed-dial-tooltip {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 /* Modal Styling */
@@ -852,7 +771,7 @@ body.ui-confirm-open { overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
   padding: 0.65rem 0.75rem;
   border-radius: var(--radius-md);
   border: none;
@@ -863,9 +782,13 @@ body.ui-confirm-open { overflow: hidden; }
   transition: all 0.2s ease;
 }
 
+.ai-launch-btn svg {
+  flex-shrink: 0;
+}
+
 .ai-launch-btn:hover {
   transform: translateY(-2px);
-  filter: brightness(1.1);
+  filter: brightness(1.08);
   box-shadow: var(--shadow-md);
 }
 
@@ -882,11 +805,9 @@ body.ui-confirm-open { overflow: hidden; }
 }
 
 @media (max-width: 640px) {
-  .floating-ai-widget {
+  .floating-ai-btn {
     bottom: 66px;
     right: 16px;
-  }
-  .floating-ai-main-btn {
     padding: 8px 12px;
     font-size: 0.8rem;
   }

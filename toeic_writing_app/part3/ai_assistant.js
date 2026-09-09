@@ -1,5 +1,5 @@
 /**
- * TOEIC Writing - AI Assistant Widget & Speed-Dial
+ * TOEIC Writing - AI Assistant Widget & Prompt Generator
  * Supports Gemini, ChatGPT, and Claude.
  * Works across Part 1, Part 2, and Part 3.
  */
@@ -189,22 +189,11 @@
    * Initialize UI Controller
    */
   function initAiAssistant() {
-    const floatingAiWidget = document.getElementById('floatingAiWidget');
+    const floatingAiBtn = document.getElementById('floatingAiBtn') || document.getElementById('floatingAiWidget') || document.getElementById('aiMainTriggerBtn');
     const aiAssistantModal = document.getElementById('aiAssistantModal');
-    const aiMainTriggerBtn = document.getElementById('aiMainTriggerBtn');
     const aiPromptTextarea = document.getElementById('aiPromptTextarea');
     const aiQuestionSummary = document.getElementById('aiQuestionSummary');
     const aiCopyPromptBtn = document.getElementById('aiCopyPromptBtn');
-
-    // Quick Speed-Dial Action Buttons
-    const speedDialButtons = document.querySelectorAll('[data-ai-platform]');
-    speedDialButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const platform = btn.getAttribute('data-ai-platform');
-        launchPlatform(platform);
-      });
-    });
 
     // Main button opens full prompt modal
     function openPromptModal() {
@@ -235,8 +224,8 @@
       if (aiAssistantModal) aiAssistantModal.classList.remove('active');
     }
 
-    if (aiMainTriggerBtn) {
-      aiMainTriggerBtn.addEventListener('click', openPromptModal);
+    if (floatingAiBtn) {
+      floatingAiBtn.addEventListener('click', openPromptModal);
     }
 
     document.querySelectorAll('.close-btn[data-close="aiAssistantModal"]').forEach(btn => {
