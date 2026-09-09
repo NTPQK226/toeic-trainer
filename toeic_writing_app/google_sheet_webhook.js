@@ -20,8 +20,13 @@
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var rawData = e.postData.contents;
-    var data = JSON.parse(rawData);
+    var rawData = e && e.postData && e.postData.contents ? e.postData.contents : '{}';
+    var data = {};
+    try {
+      data = JSON.parse(rawData);
+    } catch (parseErr) {
+      data = (e && e.parameter) ? e.parameter : {};
+    }
     
     var timestamp = data.timestamp || new Date().toLocaleString('vi-VN');
     var type = data.type || '';

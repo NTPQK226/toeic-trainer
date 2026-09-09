@@ -9,7 +9,6 @@
   const STORAGE_KEY_FEEDBACKS = 'toeic_user_feedbacks';
   const STORAGE_KEY_WEBHOOK = 'toeic_feedback_sheet_webhook';
 
-  // Default Google Apps Script Webhook Endpoint (can be configured via localStorage)
   function getWebhookUrl() {
     return localStorage.getItem(STORAGE_KEY_WEBHOOK) || '';
   }
@@ -54,6 +53,36 @@
     }
 
     return questionText ? `${partName} • ${questionText}` : partName;
+  }
+
+  /**
+   * Send data to Webhook in background without blocking UI
+   */
+  function dispatchWebhook(webhookUrl, feedbackData) {
+    if (!webhookUrl) return;
+    
+    const payload = JSON.stringify(feedbackData);
+
+    // 1. Try navigator.sendBeacon (instant background transmission)
+    if (navigator.sendBeacon) {
+      try {
+        const blob = new Blob([payload], { type: 'text/plain;charset=utf-8' });
+        const success = navigator.sendBeacon(webhookUrl, blob);
+        if (success) return;
+      } catch (beaconErr) {
+        // Fallback to fetch
+      }
+    }
+
+    // 2. Fallback to asynchronous non-blocking fetch with text/plain (avoids CORS preflight)
+    fetch(webhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: payload
+    }).catch(function (err) {
+      console.warn('Webhook background sync completed with notice:', err);
+    });
   }
 
   /**
@@ -108,7 +137,7 @@
 
     // Submit handler
     if (feedbackForm) {
-      feedbackForm.addEventListener('submit', async (e) => {
+      feedbackForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const content = feedbackContent ? feedbackContent.value.trim() : '';
         if (!content) {
@@ -140,45 +169,25 @@
           userAgent: navigator.userAgent || ''
         };
 
-        // Save backup to LocalStorage
+        // 1. Save backup to LocalStorage immediately
         saveFeedbackLocally(feedbackData);
 
-        const origBtnHtml = submitFeedbackBtn ? submitFeedbackBtn.innerHTML : '';
-        if (submitFeedbackBtn) {
-          submitFeedbackBtn.disabled = true;
-          submitFeedbackBtn.innerHTML = '<span class="ai-loading-spinner"></span> Đang gửi...';
-        }
-
+        // 2. Dispatch to Google Sheet Webhook in background
         const webhookUrl = getWebhookUrl();
-        if (webhookUrl) {
-          try {
-            await fetch(webhookUrl, {
-              method: 'POST',
-              mode: 'no-cors',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(feedbackData)
-            });
-          } catch (netErr) {
-            console.warn('Webhook post failed, feedback saved locally:', netErr);
-          }
-        }
+        dispatchWebhook(webhookUrl, feedbackData);
 
-        if (submitFeedbackBtn) {
-          submitFeedbackBtn.disabled = false;
-          submitFeedbackBtn.innerHTML = origBtnHtml;
-        }
-
-        // Reset form inputs
+        // 3. Reset form inputs
         if (feedbackContent) feedbackContent.value = '';
         if (feedbackContact) feedbackContact.value = '';
 
-        if (window.ToeicUi) {
-          window.ToeicUi.toast('Cảm ơn bạn đã gửi góp ý! Ý kiến của bạn đã được ghi nhận thành công.', 'success', 5000);
-        } else {
-          alert('Cảm ơn bạn đã gửi góp ý! Ý kiến của bạn đã được ghi nhận thành công.');
-        }
-
+        // 4. Close modal and show success toast immediately
         closeFeedbackModal();
+
+        if (window.ToeicUi) {
+          window.ToeicUi.toast('Cảm ơn bạn đã gửi góp ý! Ý kiến đã được ghi nhận vào hệ thống.', 'success', 5000);
+        } else {
+          alert('Cảm ơn bạn đã gửi góp ý! Ý kiến đã được ghi nhận vào hệ thống.');
+        }
       });
     }
   }
