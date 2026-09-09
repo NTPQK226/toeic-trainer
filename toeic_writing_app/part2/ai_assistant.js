@@ -25,7 +25,7 @@
   };
 
   /**
-   * Determine current active part, mode (Test vs Practice), and question context
+   * Determine current active part, mode (Test vs Practice), and question context in real-time
    */
   function getQuestionContext() {
     const isP3 = window.location.pathname.includes('/part3') || (document.body && document.body.dataset && document.body.dataset.part === '3');
@@ -48,10 +48,14 @@
       if (isTestMode) {
         // Test Simulation Mode
         const badge = document.getElementById('testQuestionBadge');
-        questionInfo = badge ? badge.textContent.trim() : 'Question 8 • Opinion Essay';
+        const testSelect = document.getElementById('testSelect');
+        const selectedOpt = testSelect ? testSelect.options[testSelect.selectedIndex]?.textContent : '';
+        questionInfo = badge ? badge.textContent.trim() : (selectedOpt || 'Question 8 • Opinion Essay');
         
         const promptEl = document.getElementById('testPromptText');
-        if (promptEl) promptDetail = promptEl.textContent.trim();
+        if (promptEl && promptEl.textContent.trim() && !promptEl.textContent.includes('Đang tải')) {
+          promptDetail = promptEl.textContent.trim();
+        }
         
         const promptViEl = document.getElementById('testPromptViText');
         if (promptViEl && promptViEl.textContent.trim() && !promptViEl.textContent.includes('Chưa có bản dịch')) {
@@ -63,7 +67,9 @@
       } else {
         // Practice Mode
         const badge = document.getElementById('practiceQuestionBadge');
-        questionInfo = badge ? badge.textContent.trim() : 'Part 3 Essay';
+        const questionSelect = document.getElementById('practiceQuestionSelect');
+        const selectedOpt = questionSelect ? questionSelect.options[questionSelect.selectedIndex]?.textContent : '';
+        questionInfo = badge ? badge.textContent.trim() : (selectedOpt || 'Part 3 Essay');
 
         const promptEl = document.getElementById('practicePromptText');
         if (promptEl) promptDetail = promptEl.textContent.trim();
@@ -95,8 +101,12 @@
         if (emailFrom && emailTo && emailSubj) {
           details.push(`From: ${emailFrom.textContent.trim()} | To: ${emailTo.textContent.trim()} | Subject: ${emailSubj.textContent.trim()}`);
         }
-        if (emailBody) details.push('Nội dung Email:\n' + emailBody.textContent.trim());
-        if (dirText) details.push('Yêu cầu trả lời (Directions):\n' + dirText.textContent.trim());
+        if (emailBody && emailBody.textContent.trim()) {
+          details.push('Nội dung Email:\n' + emailBody.textContent.trim());
+        }
+        if (dirText && dirText.textContent.trim()) {
+          details.push('Yêu cầu trả lời (Directions):\n' + dirText.textContent.trim());
+        }
         promptDetail = details.join('\n\n');
 
         const ta = document.getElementById('testTextarea');
@@ -116,8 +126,12 @@
         if (emailFrom && emailTo && emailSubj) {
           details.push(`From: ${emailFrom.textContent.trim()} | To: ${emailTo.textContent.trim()} | Subject: ${emailSubj.textContent.trim()}`);
         }
-        if (emailBody) details.push('Nội dung Email:\n' + emailBody.textContent.trim());
-        if (dirText) details.push('Yêu cầu trả lời (Directions):\n' + dirText.textContent.trim());
+        if (emailBody && emailBody.textContent.trim()) {
+          details.push('Nội dung Email:\n' + emailBody.textContent.trim());
+        }
+        if (dirText && dirText.textContent.trim()) {
+          details.push('Yêu cầu trả lời (Directions):\n' + dirText.textContent.trim());
+        }
         promptDetail = details.join('\n\n');
 
         const ta = document.getElementById('practiceTextarea');
@@ -217,57 +231,83 @@
   }
 
   /**
-   * Synchronously and reliably copy text to clipboard across all browsers
+   * Synchronously and reliably copy text to clipboard across all browsers before tab navigation
    */
   function copyTextSynchronously(text) {
+    if (!text) return false;
     let success = false;
     
-    // Method 1: execCommand with a temporary textarea (executes synchronously within user click stack)
+    // Method 1: execCommand with a real selectable DOM element (100% synchronous in user gesture)
     try {
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.setAttribute('readonly', '');
       ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
+      ta.style.left = '0';
       ta.style.top = '0';
-      ta.style.opacity = '0';
+      ta.style.width = '2em';
+      ta.style.height = '2em';
+      ta.style.padding = '0';
+      ta.style.border = 'none';
+      ta.style.outline = 'none';
+      ta.style.boxShadow = 'none';
+      ta.style.background = 'transparent';
+      ta.style.opacity = '0.01';
+      ta.style.zIndex = '-9999';
+      
       document.body.appendChild(ta);
-      ta.focus();
+      ta.focus({ preventScroll: true });
       ta.select();
       ta.setSelectionRange(0, text.length);
+      
       success = document.execCommand('copy');
       document.body.removeChild(ta);
     } catch (e) {
-      console.warn('execCommand copy error:', e);
+      console.warn('execCommand copy failed:', e);
     }
 
     // Method 2: Modern Async Clipboard API as an additional background ensure
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).catch(err => {
-        console.warn('navigator.clipboard writeText error:', err);
-      });
+      try {
+        navigator.clipboard.writeText(text).catch(() => {});
+      } catch (e) {}
     }
 
     return success;
   }
 
   /**
-   * Launch AI Platform with Prompt copied safely
+   * Launch AI Platform with fresh Prompt copied & auto-filled
    */
   function launchPlatform(platformKey, customText) {
-    const p = PLATFORMS[platformKey] || PLATFORMS.gemini;
-    const prompt = (customText && customText.trim()) ? customText.trim() : buildPrompt('review');
+    const activeTemplate = document.querySelector('.ai-template-btn.active')?.getAttribute('data-template') || 'review';
+    
+    // Always resolve the freshest prompt at the exact instant of clicking
+    let prompt = (customText && customText.trim()) ? customText.trim() : buildPrompt(activeTemplate);
 
-    // 1. Copy text to clipboard immediately in the user gesture
-    copyTextSynchronously(prompt);
-
-    // 2. Display Toast feedback
-    if (window.ToeicUi) {
-      window.ToeicUi.toast(`Đã sao chép Prompt! Hãy nhấn Ctrl + V trên ${p.name} để nhận giải đáp ngay.`, 'success', 6000);
+    // If customText wasn't manually edited by user, regenerate to ensure latest studentAnswer is captured
+    const aiPromptTextarea = document.getElementById('aiPromptTextarea');
+    if (!aiPromptTextarea || aiPromptTextarea.dataset.userEdited !== 'true') {
+      prompt = buildPrompt(activeTemplate);
     }
 
-    // 3. Open target AI page in new tab
-    window.open(p.url, '_blank');
+    // 1. Copy text to clipboard synchronously BEFORE switching tabs
+    copyTextSynchronously(prompt);
+
+    // 2. Construct URL with query parameters where supported (ChatGPT natively auto-fills ?q=)
+    const p = PLATFORMS[platformKey] || PLATFORMS.gemini;
+    let targetUrl = p.url;
+    if (platformKey === 'chatgpt') {
+      targetUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
+    }
+
+    // 3. Display Toast feedback
+    if (window.ToeicUi) {
+      window.ToeicUi.toast(`Đã sao chép Prompt mới nhất! Hãy nhấn Ctrl + V trên ${p.name} để nhận giải đáp ngay.`, 'success', 6000);
+    }
+
+    // 4. Open AI platform in new tab
+    window.open(targetUrl, '_blank');
   }
 
   /**
@@ -280,7 +320,7 @@
     const aiQuestionSummary = document.getElementById('aiQuestionSummary');
     const aiCopyPromptBtn = document.getElementById('aiCopyPromptBtn');
 
-    // Main button opens full prompt modal
+    // Main button opens full prompt modal with fresh context
     function openPromptModal() {
       if (!aiAssistantModal) return;
       
@@ -292,6 +332,7 @@
       // Default prompt template: review (if answered) or grammar (if not answered)
       const defaultTemplate = ctx.studentAnswer ? 'review' : 'grammar';
       if (aiPromptTextarea) {
+        aiPromptTextarea.dataset.userEdited = 'false';
         aiPromptTextarea.value = buildPrompt(defaultTemplate);
       }
 
@@ -324,6 +365,13 @@
       });
     }
 
+    // Track if user manually typed in the textarea
+    if (aiPromptTextarea) {
+      aiPromptTextarea.addEventListener('input', () => {
+        aiPromptTextarea.dataset.userEdited = 'true';
+      });
+    }
+
     // Template switcher buttons inside modal
     document.querySelectorAll('.ai-template-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -331,6 +379,7 @@
         btn.classList.add('active');
         const tType = btn.getAttribute('data-template');
         if (aiPromptTextarea) {
+          aiPromptTextarea.dataset.userEdited = 'false';
           aiPromptTextarea.value = buildPrompt(tType);
         }
       });
@@ -340,7 +389,9 @@
     document.querySelectorAll('[data-modal-ai-platform]').forEach(btn => {
       btn.addEventListener('click', () => {
         const platform = btn.getAttribute('data-modal-ai-platform');
-        const customPrompt = aiPromptTextarea ? aiPromptTextarea.value.trim() : '';
+        const customPrompt = (aiPromptTextarea && aiPromptTextarea.dataset.userEdited === 'true')
+          ? aiPromptTextarea.value.trim()
+          : '';
         launchPlatform(platform, customPrompt);
         closePromptModal();
       });
@@ -349,12 +400,16 @@
     // Copy Prompt Button inside modal
     if (aiCopyPromptBtn) {
       aiCopyPromptBtn.addEventListener('click', () => {
-        const text = aiPromptTextarea ? aiPromptTextarea.value.trim() : buildPrompt('grammar');
+        const activeTemplate = document.querySelector('.ai-template-btn.active')?.getAttribute('data-template') || 'review';
+        const text = (aiPromptTextarea && aiPromptTextarea.dataset.userEdited === 'true')
+          ? aiPromptTextarea.value.trim()
+          : buildPrompt(activeTemplate);
+          
         copyTextSynchronously(text);
         if (window.ToeicUi) {
-          window.ToeicUi.toast('Đã sao chép nội dung Prompt vào bộ nhớ tạm! (Ctrl + V để dán)', 'success');
+          window.ToeicUi.toast('Đã sao chép nội dung Prompt mới nhất vào bộ nhớ tạm! (Ctrl + V để dán)', 'success');
         } else {
-          alert('Đã sao chép nội dung Prompt vào bộ nhớ tạm! (Ctrl + V để dán)');
+          alert('Đã sao chép nội dung Prompt mới nhất vào bộ nhớ tạm! (Ctrl + V để dán)');
         }
       });
     }
