@@ -701,9 +701,17 @@
     if (el.modeFullBtn) el.modeFullBtn.addEventListener('click', () => switchMode('full'));
     if (el.modePracticeBtn) el.modePracticeBtn.addEventListener('click', () => switchMode('practice'));
 
-    if (el.startTestBtn) el.startTestBtn.addEventListener('click', () => {
+    if (el.startTestBtn) el.startTestBtn.addEventListener('click', async () => {
       const idx = parseInt(el.testSelect.value, 10);
-      startTest(idx);
+      const q = questions[idx];
+      const topic = q ? (q.topic || q.category_vi || '') : '';
+      const ok = window.ToeicUi
+        ? await window.ToeicUi.confirm(
+            `Sắp bắt đầu Bài thi Part 3 — Bài luận (Q8).${topic ? `\n\nĐề: ${topic}.` : ''}\n\n⏱ Thời gian: 30 phút. Đồng hồ sẽ chạy ngay và không thể tạm dừng.`,
+            { title: 'Bắt đầu bài thi?', okText: 'Bắt Đầu', cancelText: 'Để sau' }
+          )
+        : true;
+      if (ok) startTest(idx);
     });
     if (el.testSelect) el.testSelect.addEventListener('change', () => {
       startTest(parseInt(el.testSelect.value, 10));

@@ -754,6 +754,8 @@
     // badge class by part accent
     var partCls = blk.id === 'p1' ? ' p1' : (blk.id.indexOf('p2') === 0 ? ' p2' : ' p3');
     el.blockBadge.className = 'block-badge' + partCls;
+    // drive per-part accent for the whole exam screen (timer, dots, answers)
+    if (el.examScreen) el.examScreen.setAttribute('data-part', blk.id === 'p1' ? 'p1' : (blk.id.indexOf('p2') === 0 ? 'p2' : 'p3'));
     // timer label depends on block
     if (el.timerLabel) {
       if (blk.id === 'p1') el.timerLabel.textContent = 'Cả khối Q1–5 còn';

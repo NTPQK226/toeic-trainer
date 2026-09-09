@@ -1205,9 +1205,17 @@
     if(el.testSelect) el.testSelect.addEventListener('change', () => {
       // Option chosen, can start
     });
-    if(el.startTestBtn) el.startTestBtn.addEventListener('click', () => {
-      const idx = el.testSelect.value;
-      startTest(idx);
+    if(el.startTestBtn) el.startTestBtn.addEventListener('click', async () => {
+      const idx = parseInt(el.testSelect.value, 10) || 0;
+      const q1 = questions[idx * 2];
+      const topic = q1 ? (CATEGORY_MAP[q1.category] || q1.category_vi || '') : '';
+      const ok = window.ToeicUi
+        ? await window.ToeicUi.confirm(
+            `Sắp bắt đầu Bài thi Part 2 — 2 email (Q6 & Q7).${topic ? ` Chủ đề: ${topic}.` : ''}\n\n⏱ Thời gian: MỖI câu 10 phút riêng. Đồng hồ sẽ chạy ngay và không thể tạm dừng.`,
+            { title: 'Bắt đầu bài thi?', okText: 'Bắt Đầu', cancelText: 'Để sau' }
+          )
+        : true;
+      if (ok) startTest(idx);
     });
     
     if(el.testPrevBtn) el.testPrevBtn.addEventListener('click', () => {

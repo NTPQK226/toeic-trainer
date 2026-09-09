@@ -1080,8 +1080,17 @@
     el.modePracticeBtn.addEventListener('click', () => switchMode('practice'));
 
     // Test Selection & Start
-    el.startTestBtn.addEventListener('click', () => {
-      startTest(parseInt(el.testSelect.value, 10));
+    el.startTestBtn.addEventListener('click', async () => {
+      const idx = parseInt(el.testSelect.value, 10);
+      const qStart = idx * 5 + 1;
+      const qEnd = Math.min((idx + 1) * 5, questions.length);
+      const ok = window.ToeicUi
+        ? await window.ToeicUi.confirm(
+            `Sắp bắt đầu Bài thi Part 1 — Câu ${qStart}–${qEnd} (5 câu).\n\n⏱ Thời gian: 8 phút. Đồng hồ sẽ chạy ngay khi bạn bắt đầu và không thể tạm dừng.`,
+            { title: 'Bắt đầu bài thi?', okText: 'Bắt Đầu', cancelText: 'Để sau' }
+          )
+        : true;
+      if (ok) startTest(idx);
     });
     el.testSelect.addEventListener('change', () => {
       startTest(parseInt(el.testSelect.value, 10));

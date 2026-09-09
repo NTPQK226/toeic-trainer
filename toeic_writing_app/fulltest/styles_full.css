@@ -106,8 +106,8 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
   grid-template-columns: repeat(3, 1fr);
   gap: 0.7rem;
   margin-top: 0.2rem;
-  flex: 1;
-  min-height: 0;
+  align-content: start;
+  align-items: start;
 }
 
 /* Part setup cards: distinct top accent, clean white body, hover lift */
@@ -120,6 +120,7 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
   overflow: hidden;
   border-top: 3px solid var(--border-color);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  height: auto;
 }
 .part-setup-card.accent-1 { border-top-color: var(--c1); }
 .part-setup-card.accent-2 { border-top-color: var(--c2); }
@@ -232,6 +233,27 @@ body[data-part="full"] .fulltest-cta.active:hover { color: #fff; box-shadow: 0 4
 .block-badge.p1 { background: var(--c1-light); color: var(--c1); border-color: transparent; }
 .block-badge.p2 { background: var(--c2-light); color: var(--c2); border-color: transparent; }
 .block-badge.p3 { background: var(--c3-light); color: var(--c3); border-color: transparent; }
+
+/* Per-part accent cho toàn màn hình thi (timer, dot active, khối câu hỏi...)
+   đồng bộ với màu từng part như P2/P3 */
+#examScreen[data-part="p1"] .timer-widget { border-color: rgba(37, 99, 235, 0.5) !important; background: #dbeafe !important; color: #1d4ed8 !important; }
+#examScreen[data-part="p2"] .timer-widget { border-color: rgba(99, 102, 241, 0.5) !important; background: #e0e7ff !important; color: #4f46e5 !important; }
+#examScreen[data-part="p3"] .timer-widget { border-color: rgba(22, 163, 74, 0.5) !important; background: #dcfce7 !important; color: #15803d !important; }
+#examScreen[data-part="p2"] .timer-widget.warning,
+#examScreen[data-part="p3"] .timer-widget.warning { color: #b45309 !important; border-color: #f59e0b !important; background: #fef3c7 !important; }
+#examScreen[data-part="p1"] .ep-dot.current,
+#examScreen[data-part="p1"] .ep-dot.current.answered { background: var(--c1); border-color: var(--c1); box-shadow: 0 2px 6px rgba(37,99,235,0.35); }
+#examScreen[data-part="p2"] .ep-dot.current,
+#examScreen[data-part="p2"] .ep-dot.current.answered { background: var(--c2); border-color: var(--c2); box-shadow: 0 2px 6px rgba(99,102,241,0.35); }
+#examScreen[data-part="p3"] .ep-dot.current,
+#examScreen[data-part="p3"] .ep-dot.current.answered { background: var(--c3); border-color: var(--c3); box-shadow: 0 2px 6px rgba(22,163,74,0.35); }
+#examScreen[data-part="p1"] .q-title svg,
+#examScreen[data-part="p1"] .kw-chip { color: var(--c1); background: var(--c1-light); }
+#examScreen[data-part="p2"] .q-title svg { color: var(--c2); }
+#examScreen[data-part="p3"] .q-title svg { color: var(--c3); }
+#examScreen[data-part="p1"] .directions-box { border-left-color: var(--c1); }
+#examScreen[data-part="p2"] .directions-box { border-left-color: var(--c2); }
+#examScreen[data-part="p3"] .directions-box { border-left-color: var(--c3); }
 
 .timer-area { display: flex; align-items: center; gap: 0.5rem; }
 .timer-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
