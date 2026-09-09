@@ -399,50 +399,50 @@
        MODAL 1: ETS SCORING RUBRIC (Quy chuẩn chấm điểm chuẩn ETS)
        ==================================================================== -->
   <div id="rubricModal" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 680px;">
       <div class="modal-header">
         <h3 class="modal-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-          Thang Điểm & Tiêu Chí Chấm ETS Part 1
+          Tiêu Chí Chấm Điểm TOEIC Writing Part 1 (SEC)
         </h3>
         <button class="close-btn" data-close="rubricModal">&times;</button>
       </div>
       <div style="font-size: 0.92rem; line-height: 1.6; color: var(--text-main);">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          Mỗi câu trong Part 1 được giám khảo ETS chấm trên thang từ <strong>0 đến 3 điểm</strong> dựa trên 2 tiêu chí cốt lõi: <em>Grammar (Ngữ pháp)</em> và <em>Relevance (Sự phù hợp với tranh & dùng từ khoá)</em>:
+          Thang điểm chuẩn khảo thí <strong>Part 1: Tả tranh sử dụng 2 từ cho sẵn</strong> (Thang điểm 0–3):
         </p>
 
         <div style="background: var(--success-light); border-left: 4px solid var(--success); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.85rem;">
-          <strong style="color: var(--success);">3 ĐIỂM (Tối đa):</strong>
+          <strong style="color: var(--success); font-size: 1rem;">Điểm 3 (Tối đa):</strong>
           <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
-            <li>Đúng ngữ pháp, cấu trúc câu tự nhiên, không có lỗi sai nghiêm trọng.</li>
-            <li>Sử dụng chính xác cả 2 từ khoá bắt buộc (được chia thì, biến đổi số ít/nhiều).</li>
-            <li>Miêu tả đúng trọng tâm bức tranh và viết đúng <strong>duy nhất 1 câu</strong>.</li>
+            <li>Không có lỗi ngữ pháp.</li>
+            <li>Sử dụng đúng cả 2 từ cho sẵn (đúng dạng và hợp ngữ cảnh).</li>
+            <li>Phù hợp với hình ảnh.</li>
           </ul>
         </div>
 
         <div style="background: var(--warning-light); border-left: 4px solid var(--warning); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.85rem;">
-          <strong style="color: var(--warning);">2 ĐIỂM (Khá Tốt):</strong>
+          <strong style="color: var(--warning); font-size: 1rem;">Điểm 2 (Bài viết có thể là một hoặc nhiều câu):</strong>
           <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
-            <li>Sử dụng được cả 2 từ khoá nhưng mắc 1 lỗi ngữ pháp chính (chia sai thì, chủ ngữ - động từ không khớp, sai dạng từ).</li>
-            <li>HOẶC sử dụng 1 từ khoá rất xuất sắc và ngữ pháp hoàn hảo.</li>
+            <li>Có lỗi ngữ pháp nhẹ, không làm sai nghĩa.</li>
+            <li>Có đủ cả 2 từ, có thể sai dạng hoặc không trong cùng câu.</li>
+            <li>Vẫn đúng với hình ảnh.</li>
           </ul>
         </div>
 
         <div style="background: var(--danger-light); border-left: 4px solid var(--danger); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.85rem;">
-          <strong style="color: var(--danger);">1 ĐIỂM (Cần Cải Thiện):</strong>
+          <strong style="color: var(--danger); font-size: 1rem;">Điểm 1 (Chưa Đạt Yêu Cầu):</strong>
           <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
-            <li>Chỉ dùng được 1 từ khoá và câu còn nhiều lỗi sai ngữ pháp.</li>
-            <li>Nội dung mơ hồ, ít liên quan đến bức tranh.</li>
+            <li>Có lỗi làm sai nghĩa, khó hiểu.</li>
+            <li>Thiếu 1 hoặc cả 2 từ.</li>
+            <li>Không phù hợp với hình ảnh.</li>
           </ul>
         </div>
 
         <div style="background: var(--bg-main); border-left: 4px solid var(--text-muted); padding: 0.75rem 1rem; border-radius: 4px;">
-          <strong style="color: var(--text-muted);">0 ĐIỂM (Không Đạt):</strong>
+          <strong style="color: var(--text-muted); font-size: 1rem;">Điểm 0 (Không Tính Điểm):</strong>
           <ul style="margin-top: 0.4rem; padding-left: 1.25rem;">
-            <li>Bỏ trống không trả lời.</li>
-            <li>Viết nhiều hơn 1 câu (vi phạm quy tắc cốt lõi của Part 1).</li>
-            <li>Không sử dụng từ khoá nào hoặc câu hoàn toàn không liên quan đến tranh.</li>
+            <li>Bỏ trống, viết bằng ngôn ngữ khác, hoặc chỉ gõ ký tự linh tinh.</li>
           </ul>
         </div>
       </div>
