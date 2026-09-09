@@ -815,3 +815,35 @@ body.ui-confirm-open { overflow: hidden; }
     grid-template-columns: 1fr;
   }
 }
+.ai-launch-hint-note {
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.ai-launch-hint-note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--primary);
+}
+
+.ai-launch-hint-note kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 0.74rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--text-main);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
