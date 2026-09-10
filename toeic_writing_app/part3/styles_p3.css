@@ -302,7 +302,8 @@ select.custom-select option, .custom-select option { font-weight: 500; color: va
 /* Right: essay editor card */
 .essay-card {
   background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-  overflow: hidden; box-shadow: var(--shadow-md); display: flex; flex-direction: column; height: auto; min-height: 0;
+  overflow: hidden; box-shadow: var(--shadow-md); display: flex; flex-direction: column; height: auto;
+  max-height: calc(100vh - 9rem); min-height: 0;
 }
 .essay-card-header {
   display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.8rem;
@@ -323,6 +324,13 @@ select.custom-select option, .custom-select option { font-weight: 500; color: va
 }
 .essay-textarea:focus { background: rgba(22,163,74,0.02); }
 @media (max-width: 960px) { .essay-textarea { min-height: 280px; } }
+/* Màn hình laptop thấp: gọn vừa 1 trang */
+@media (max-height: 800px) {
+  .essay-textarea { min-height: 300px; }
+  .prompt-viewer-card, .essay-card { max-height: calc(100vh - 8.5rem); }
+  .test-select-bar { padding: 0.3rem 0.6rem; margin-bottom: 0.35rem; }
+  .prompt-scroll { padding: 0.7rem 0.9rem; gap: 0.6rem; }
+}
 
 /* Practice actions */
 .practice-actions-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem; flex-wrap: wrap !important; }

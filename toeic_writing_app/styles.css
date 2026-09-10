@@ -437,13 +437,14 @@ select.custom-select option, .custom-select option {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--bg-card);
-  border: 2px solid var(--border-color);
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   padding: 0.35rem 0.85rem;
   border-radius: var(--radius-full);
   font-weight: 700;
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
+  color: var(--primary);
   transition: var(--transition);
 }
 
@@ -1177,18 +1178,18 @@ select.custom-select option, .custom-select option {
 }
 
 .ai-toggle-switch:hover {
-  border-color: #8b5cf6;
-  color: #8b5cf6;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .ai-toggle-switch.active {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.15));
-  border-color: #8b5cf6;
-  color: #8b5cf6;
+  background: rgba(37, 99, 235, 0.12);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .ai-toggle-switch.active strong {
-  color: #8b5cf6 !important;
+  color: var(--primary) !important;
 }
 
 
