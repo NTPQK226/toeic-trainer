@@ -237,6 +237,26 @@
   }
 
   // --- AI Config Controller ---
+  // Turns a raw Gemini error into an actionable Vietnamese message, so a bad key
+  // is explained instead of silently leaving the toggle in a broken ON state.
+  function describeAiKeyError(raw) {
+    const msg = String(raw || '');
+    if (!msg) return 'Không xác minh được API Key. Vui lòng thử lại.';
+    if (msg.includes('QUOTA_EXCEEDED')) {
+      return msg.replace('QUOTA_EXCEEDED: ', '');
+    }
+    if (/API key not valid|API_KEY_INVALID|invalid api key/i.test(msg)) {
+      return 'API Key không hợp lệ. Hãy kiểm tra lại key đã sao chép đủ và đúng chưa.';
+    }
+    if (/PERMISSION_DENIED|403/.test(msg)) {
+      return 'API Key bị từ chối (PERMISSION_DENIED). Key có thể đã bị thu hồi hoặc chưa bật Gemini API.';
+    }
+    if (/Failed to fetch|NetworkError|network/i.test(msg)) {
+      return 'Không kết nối được tới Google Gemini. Kiểm tra mạng rồi thử lại.';
+    }
+    return 'Không thể bật Giám Khảo AI: ' + msg;
+  }
+
   function initAiConfig() {
     if (!window.ToeicLlmEvaluator) return;
 
@@ -244,10 +264,41 @@
     if (el.aiModelSelect) el.aiModelSelect.value = window.ToeicLlmEvaluator.getModel();
     updateAiToggleUI();
 
-    function handleAiToggle() {
-      const currentlyEnabled = window.ToeicLlmEvaluator.isEnabled();
-      window.ToeicLlmEvaluator.setEnabled(!currentlyEnabled);
-      updateAiToggleUI();
+    // Turning AI ON requires a key that Google actually accepts. Previously any
+    // string — including a mistyped key — flipped the switch to ON and only failed
+    // later at grading time. Now we verify with a live call and keep it OFF on failure.
+    async function handleAiToggle() {
+      if (window.ToeicLlmEvaluator.isEnabled()) {
+        window.ToeicLlmEvaluator.setEnabled(false);
+        updateAiToggleUI();
+        return;
+      }
+
+      const btns = [el.aiToggleSwitch, el.aiToggleSwitchFull].filter(Boolean);
+      btns.forEach(b => { b.disabled = true; b.classList.add('verifying'); });
+      try {
+        const res = await window.ToeicLlmEvaluator.activate();
+        updateAiToggleUI();
+
+        if (!res.ok) {
+          const msg = describeAiKeyError(res.error);
+          if (window.ToeicUi) window.ToeicUi.toast(msg, 'error', 6000);
+          else alert(msg);
+          openModal(el.aiConfigModal);
+          showAiStatus(msg, 'error');
+          return;
+        }
+
+        if (res.warning) {
+          if (window.ToeicUi) window.ToeicUi.toast(res.warning, 'warning', 6000);
+        } else if (window.ToeicUi) {
+          window.ToeicUi.toast(res.usingSystemKey
+            ? 'Đã bật Giám Khảo AI (đang dùng key dùng thử chung).'
+            : 'Đã bật Giám Khảo AI bằng API Key cá nhân của bạn.', 'success');
+        }
+      } finally {
+        btns.forEach(b => { b.disabled = false; b.classList.remove('verifying'); });
+      }
     }
 
     if (el.aiToggleSwitch) {
@@ -258,7 +309,7 @@
     }
 
     if (el.saveAiConfigBtn) {
-      el.saveAiConfigBtn.addEventListener('click', () => {
+      el.saveAiConfigBtn.addEventListener('click', async () => {
         const key = el.aiApiKeyInput.value.trim();
         const model = el.aiModelSelect.value;
 
@@ -266,15 +317,30 @@
           window.ToeicLlmEvaluator.setApiKey(key);
         }
         window.ToeicLlmEvaluator.setModel(model);
-        window.ToeicLlmEvaluator.setEnabled(true);
-        updateAiToggleUI();
 
         const origHtml = el.saveAiConfigBtn.innerHTML;
+        el.saveAiConfigBtn.disabled = true;
+        el.saveAiConfigBtn.innerHTML = '<span class="ai-loading-spinner"></span> Đang xác minh key...';
+        showAiStatus('Đang xác minh API Key với máy chủ Google Gemini...', 'info');
+
+        const res = await window.ToeicLlmEvaluator.activate();
+
+        el.saveAiConfigBtn.disabled = false;
+        el.saveAiConfigBtn.innerHTML = origHtml;
+        updateAiToggleUI();
+
+        if (!res.ok) {
+          const msg = describeAiKeyError(res.error);
+          showAiStatus('Không thể bật Giám Khảo AI. ' + msg, 'error');
+          if (window.ToeicUi) window.ToeicUi.toast(msg, 'error', 6000);
+          return;
+        }
+
         el.saveAiConfigBtn.innerHTML = `${ICONS.check} Đã Lưu!`;
         el.saveAiConfigBtn.style.backgroundColor = '#10b981';
         el.saveAiConfigBtn.style.borderColor = '#10b981';
 
-        showAiStatus('Đã lưu cấu hình và kích hoạt Giám Khảo AI thành công!', 'success');
+        showAiStatus(res.warning || 'Đã xác minh key và kích hoạt Giám Khảo AI thành công!', res.warning ? 'warning' : 'success');
         setTimeout(() => {
           el.saveAiConfigBtn.innerHTML = origHtml;
           el.saveAiConfigBtn.style.backgroundColor = '';

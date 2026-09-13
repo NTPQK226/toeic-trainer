@@ -199,6 +199,61 @@
   }
 
   // --- AI config ---
+  // Turns a raw Gemini error into an actionable Vietnamese message, so a bad key
+  // is explained instead of silently leaving the toggle in a broken ON state.
+  function describeAiKeyError(raw) {
+    const msg = String(raw || '');
+    if (!msg) return 'Không xác minh được API Key. Vui lòng thử lại.';
+    if (msg.includes('QUOTA_EXCEEDED')) return msg.replace('QUOTA_EXCEEDED: ', '');
+    if (/API key not valid|API_KEY_INVALID|invalid api key/i.test(msg)) {
+      return 'API Key không hợp lệ. Hãy kiểm tra lại key đã sao chép đủ và đúng chưa.';
+    }
+    if (/PERMISSION_DENIED|403/.test(msg)) {
+      return 'API Key bị từ chối (PERMISSION_DENIED). Key có thể đã bị thu hồi hoặc chưa bật Gemini API.';
+    }
+    if (/Failed to fetch|NetworkError|network/i.test(msg)) {
+      return 'Không kết nối được tới Google Gemini. Kiểm tra mạng rồi thử lại.';
+    }
+    return 'Không thể bật Giám Khảo AI: ' + msg;
+  }
+
+  // Turning AI ON requires a key that Google actually accepts. Previously any
+  // string — including a mistyped key — flipped the switch to ON and only failed
+  // later at grading time. Now we verify with a live call and keep it OFF on failure.
+  async function handleAiToggle() {
+    if (window.ToeicP3LlmEvaluator.isEnabled()) {
+      window.ToeicP3LlmEvaluator.setEnabled(false);
+      updateAiToggleUI();
+      return;
+    }
+
+    const btns = [el.aiToggleSwitch, el.aiToggleSwitchFull].filter(Boolean);
+    btns.forEach(b => { b.disabled = true; b.classList.add('verifying'); });
+    try {
+      const res = await window.ToeicP3LlmEvaluator.activate();
+      updateAiToggleUI();
+
+      if (!res.ok) {
+        const msg = describeAiKeyError(res.error);
+        if (window.ToeicUi) window.ToeicUi.toast(msg, 'error', 6000);
+        else alert(msg);
+        openModal(el.aiConfigModal);
+        showAiStatus(msg, 'error');
+        return;
+      }
+
+      if (res.warning) {
+        if (window.ToeicUi) window.ToeicUi.toast(res.warning, 'warning', 6000);
+      } else if (window.ToeicUi) {
+        window.ToeicUi.toast(res.usingSystemKey
+          ? 'Đã bật Giám Khảo AI (đang dùng key dùng thử chung).'
+          : 'Đã bật Giám Khảo AI bằng API Key cá nhân của bạn.', 'success');
+      }
+    } finally {
+      btns.forEach(b => { b.disabled = false; b.classList.remove('verifying'); });
+    }
+  }
+
   function updateAiToggleUI() {
     if (!window.ToeicP3LlmEvaluator) return;
     const enabled = window.ToeicP3LlmEvaluator.isEnabled();
@@ -240,26 +295,35 @@
     if (el.aiModelSelect) el.aiModelSelect.value = window.ToeicP3LlmEvaluator.getModel();
     updateAiToggleUI();
 
-    if (el.aiToggleSwitch) el.aiToggleSwitch.addEventListener('click', () => {
-      const next = !window.ToeicP3LlmEvaluator.isEnabled();
-      window.ToeicP3LlmEvaluator.setEnabled(next);
-      updateAiToggleUI();
-    });
-    if (el.aiToggleSwitchFull) el.aiToggleSwitchFull.addEventListener('click', () => {
-      const next = !window.ToeicP3LlmEvaluator.isEnabled();
-      window.ToeicP3LlmEvaluator.setEnabled(next);
-      updateAiToggleUI();
-    });
+    if (el.aiToggleSwitch) el.aiToggleSwitch.addEventListener('click', handleAiToggle);
+    if (el.aiToggleSwitchFull) el.aiToggleSwitchFull.addEventListener('click', handleAiToggle);
 
     if (el.saveAiConfigBtn) {
-      el.saveAiConfigBtn.addEventListener('click', () => {
+      el.saveAiConfigBtn.addEventListener('click', async () => {
         const key = (el.aiApiKeyInput.value || '').trim();
         const model = el.aiModelSelect.value;
         if (key) window.ToeicP3LlmEvaluator.setApiKey(key);
         window.ToeicP3LlmEvaluator.setModel(model);
-        window.ToeicP3LlmEvaluator.setEnabled(true);
+
+        const orig = el.saveAiConfigBtn.textContent;
+        el.saveAiConfigBtn.disabled = true;
+        el.saveAiConfigBtn.textContent = 'Đang xác minh key...';
+        showAiStatus('Đang xác minh API Key với máy chủ Google Gemini...', 'info');
+
+        const res = await window.ToeicP3LlmEvaluator.activate();
+
+        el.saveAiConfigBtn.disabled = false;
+        el.saveAiConfigBtn.textContent = orig;
         updateAiToggleUI();
-        showAiStatus('Đã lưu cấu hình và kích hoạt Giám Khảo AI thành công!', 'success');
+
+        if (!res.ok) {
+          const msg = describeAiKeyError(res.error);
+          showAiStatus('Không thể bật Giám Khảo AI. ' + msg, 'error');
+          if (window.ToeicUi) window.ToeicUi.toast(msg, 'error', 6000);
+          return;
+        }
+
+        showAiStatus(res.warning || 'Đã xác minh key và kích hoạt Giám Khảo AI thành công!', res.warning ? 'warning' : 'success');
         setTimeout(() => closeModal(el.aiConfigModal), 900);
       });
     }
@@ -285,8 +349,15 @@
       el.clearAiConfigBtn.addEventListener('click', () => {
         window.ToeicP3LlmEvaluator.clearApiKey();
         if (el.aiApiKeyInput) el.aiApiKeyInput.value = '';
+        // Clearing the key invalidates the previous verification, so AI turns itself
+        // off and must be re-verified before it can be switched on again.
         updateAiToggleUI();
-        showAiStatus('Đã xoá Key cá nhân. Hệ thống tự động chuyển sang Key dùng thử miễn phí chung.', 'info');
+        showAiStatus(
+          window.ToeicP3LlmEvaluator.isEnabled()
+            ? 'Đã xoá Key cá nhân. Hệ thống chuyển sang Key dùng thử miễn phí chung.'
+            : 'Đã xoá Key cá nhân. Giám Khảo AI đã tắt — nhập key và bấm Lưu để bật lại.',
+          'info'
+        );
       });
     }
   }

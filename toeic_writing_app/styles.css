@@ -1192,6 +1192,22 @@ select.custom-select option, .custom-select option {
   color: var(--primary) !important;
 }
 
+/* While a live key check is in flight the toggle must not look clickable. */
+.ai-toggle-switch:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.ai-toggle-switch.verifying {
+  border-color: var(--primary);
+  animation: pulse-key-check 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-key-check {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18); }
+}
+
 
 
 /* ==========================================================================

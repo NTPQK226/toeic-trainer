@@ -466,7 +466,12 @@
         name: 'Chính tả & Dấu câu chuẩn mực',
         passed: !struct.issues.some(i => i.type === 'warning' || i.type === 'error'),
         detail: struct.issues.length > 0 ? struct.issues.map(i => i.message).join(' ') : 'Viết hoa đầu câu và kết thúc bằng dấu chấm chuẩn'
-      }
+      },
+      // NOTE: The two rows above are app-side teaching checks. The official ETS
+      // axes for Questions 1-5 are grammar, relevance to the picture, and use of
+      // the two required words — see the first two criteria and the keyword row.
+      // "Relevance to the picture" cannot be verified offline (there is no vision
+      // model here); the AI grader assesses it, which is why AI mode is recommended.
     ];
 
     // Câu TRỐNG / chưa nhập → mọi tiêu chí đều ✗ (không được "tự cho" tick ngữ pháp/chủ ngữ).

@@ -245,6 +245,24 @@
   function aiSetModel(m) { var ev = getAiEv(); if (ev && ev.setModel) ev.setModel(m); }
   function aiClearKey() { var ev = getAiEv(); if (ev && ev.clearApiKey) ev.clearApiKey(); }
 
+  // Turns a raw Gemini error into an actionable Vietnamese message, so a bad key
+  // is explained instead of silently leaving AI in a broken ON state.
+  function describeAiKeyError(raw) {
+    var msg = String(raw || '');
+    if (!msg) return 'Không xác minh được API Key. Vui lòng thử lại.';
+    if (msg.indexOf('QUOTA_EXCEEDED') !== -1) return msg.replace('QUOTA_EXCEEDED: ', '');
+    if (/API key not valid|API_KEY_INVALID|invalid api key/i.test(msg)) {
+      return 'API Key không hợp lệ. Hãy kiểm tra lại key đã sao chép đủ và đúng chưa.';
+    }
+    if (/PERMISSION_DENIED|403/.test(msg)) {
+      return 'API Key bị từ chối (PERMISSION_DENIED). Key có thể đã bị thu hồi hoặc chưa bật Gemini API.';
+    }
+    if (/Failed to fetch|NetworkError|network/i.test(msg)) {
+      return 'Không kết nối được tới Google Gemini. Kiểm tra mạng rồi thử lại.';
+    }
+    return 'Không thể bật Giám Khảo AI: ' + msg;
+  }
+
   function populateAiConfigModal() {
     if (el.aiApiKeyInput) el.aiApiKeyInput.value = aiGetUserKey();
     if (el.aiModelSelect) el.aiModelSelect.value = aiGetModel();
@@ -259,15 +277,53 @@
 
   function wireAiConfig() {
     if (!el.saveAiConfigBtn || !el.testAiConfigBtn) return;
-    el.saveAiConfigBtn.addEventListener('click', function () {
+    el.saveAiConfigBtn.addEventListener('click', async function () {
       var k = el.aiApiKeyInput ? el.aiApiKeyInput.value.trim() : '';
       var m = el.aiModelSelect ? el.aiModelSelect.value : 'gemini-flash-lite-latest';
+      var ev = getAiEv();
       aiSetKey(k);
       aiSetModel(m);
-      // enable AI by default after save
-      var ev = getAiEv();
-      if (ev && ev.setEnabled) ev.setEnabled(true);
-      if (window.ToeicUi) window.ToeicUi.toast('Đã lưu cấu hình AI. AI sẽ chấm chi tiết khi bạn nộp bài.', 'success');
+
+      if (!ev) {
+        setAiTestStatus('Không có bộ chấm AI — kiểm tra file llm_evaluator đã tải.', 'error');
+        return;
+      }
+
+      // Verify before enabling: a mistyped key must never flip AI to ON and then
+      // fail silently at grading time.
+      if (typeof ev.activate !== 'function') {
+        if (ev.setEnabled) ev.setEnabled(true);
+        populateAiConfigModal();
+        if (window.ToeicUi) window.ToeicUi.toast('Đã lưu cấu hình AI.', 'success');
+        closeModal('aiConfigModal');
+        return;
+      }
+
+      var origText = el.saveAiConfigBtn.textContent;
+      el.saveAiConfigBtn.disabled = true;
+      el.saveAiConfigBtn.textContent = 'Đang xác minh key...';
+      setAiTestStatus('Đang xác minh API Key với máy chủ Google Gemini...', 'info');
+
+      var res = await ev.activate();
+
+      el.saveAiConfigBtn.disabled = false;
+      el.saveAiConfigBtn.textContent = origText;
+      populateAiConfigModal();
+
+      if (!res || !res.ok) {
+        var msg = describeAiKeyError(res && res.error);
+        setAiTestStatus('Không thể bật Giám Khảo AI. ' + msg, 'error');
+        if (window.ToeicUi) window.ToeicUi.toast(msg, 'error', 6000);
+        return;
+      }
+
+      if (res.warning) {
+        setAiTestStatus(res.warning, 'warning');
+        if (window.ToeicUi) window.ToeicUi.toast(res.warning, 'warning', 6000);
+      } else {
+        setAiTestStatus('Đã xác minh key. AI sẽ chấm chi tiết khi bạn nộp bài.', 'success');
+        if (window.ToeicUi) window.ToeicUi.toast('Đã xác minh key và bật Giám Khảo AI.', 'success');
+      }
       closeModal('aiConfigModal');
     });
     el.testAiConfigBtn.addEventListener('click', async function () {
@@ -292,7 +348,14 @@
       el.clearAiConfigBtn.addEventListener('click', function () {
         aiClearKey();
         if (el.aiApiKeyInput) el.aiApiKeyInput.value = '';
-        if (window.ToeicUi) window.ToeicUi.toast('Đã xoá key cá nhân (dùng key chung mặc định).', 'info');
+        populateAiConfigModal();
+        // Clearing the key invalidates the previous verification, so AI turns itself
+        // off and must be re-verified before it can be switched on again.
+        if (window.ToeicUi) {
+          window.ToeicUi.toast(isAiEnabled()
+            ? 'Đã xoá key cá nhân (dùng key chung mặc định).'
+            : 'Đã xoá key cá nhân. Giám Khảo AI đã tắt — nhập key và bấm Lưu để bật lại.', 'info');
+        }
       });
     }
   }

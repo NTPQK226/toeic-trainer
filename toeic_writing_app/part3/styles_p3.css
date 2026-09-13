@@ -241,6 +241,22 @@ select.custom-select option, .custom-select option { font-weight: 500; color: va
 .ai-toggle-switch.active { background: rgba(22,163,74,0.12); border-color: var(--primary); color: var(--primary); }
 .ai-toggle-switch.active strong { color: var(--primary) !important; }
 
+/* While a live key check is in flight the toggle must not look clickable. */
+.ai-toggle-switch:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.ai-toggle-switch.verifying {
+  border-color: var(--primary);
+  animation: pulse-key-check 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-key-check {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2); }
+}
+
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
