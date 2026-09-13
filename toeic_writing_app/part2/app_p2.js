@@ -61,6 +61,11 @@
   let testTimerInterval = null;
   let testIsRunning = false;
   let testIsSubmitted = false;
+  // Grading guards: testGradingRunId invalidates results coming from a superseded
+  // attempt (so a finished-but-stale AI answer can never overwrite a new report),
+  // and testIsGrading blocks two grading runs from burning API quota at once.
+  let testGradingRunId = 0;
+  let testIsGrading = false;
 
   // Practice Mode State
   let practiceActiveIndex = 0; // index in questions array
@@ -505,6 +510,12 @@
     testAnswers = {};
     testIsSubmitted = false;
 
+    // A brand-new attempt: invalidate any in-flight grading run and wipe the old
+    // report so nothing from the previous attempt can flash on screen.
+    testGradingRunId++;
+    testIsGrading = false;
+    resetReportView();
+
     // Reset timers: each question gets its own 10 minutes (ETS)
     clearInterval(testTimerInterval);
     testTimers = [TEST_Q_SECONDS, TEST_Q_SECONDS];
@@ -774,10 +785,18 @@
   }
 
   async function finalizeSubmitTest() {
+    // Only one grading run at a time (guards confirm-click + question-timeout).
+    if (testIsGrading) return;
+
+    const runId = ++testGradingRunId;
+    testIsGrading = true;
+
     clearInterval(testTimerInterval);
+    testTimerInterval = null;
     testIsRunning = false;
     testIsSubmitted = true;
     saveCurrentTestAnswer();
+    testLocks = [true, true];
 
     if (el.confirmSubmitBtn) {
       el.confirmSubmitBtn.disabled = true;
@@ -786,11 +805,10 @@
 
     const isAi = window.ToeicP2LlmEvaluator && window.ToeicP2LlmEvaluator.isEnabled();
 
-    if(el.testActiveWorkspace) el.testActiveWorkspace.style.display = 'none';
-    if(el.testReportView) {
-      el.testReportView.style.display = 'block';
-      el.testReportView.classList.add('active');
-    }
+    // UX FIX: show the report area in a "grading in progress" state (spinner +
+    // skeleton) instead of the PREVIOUS attempt's scores. The old report is wiped
+    // here, before the (slow) AI call, so the user never sees a wrong score.
+    showTestGradingState(isAi);
 
     const evaluatedQuestions = [];
     let totalScore = 0;
@@ -820,6 +838,9 @@
           qIndex: i === 0 ? 'Question 6' : 'Question 7'
         });
       }
+
+      // A newer attempt/submit started while we were grading → drop this result.
+      if (runId !== testGradingRunId) return;
 
       // Render Summary
       if(el.reportScoreNumber) el.reportScoreNumber.textContent = `${totalScore} / 8`;
@@ -918,10 +939,63 @@
         });
       }
     } finally {
+      if (runId === testGradingRunId) testIsGrading = false;
       if (el.confirmSubmitBtn) {
         el.confirmSubmitBtn.disabled = false;
         el.confirmSubmitBtn.textContent = 'Đồng Ý Nộp Bài';
       }
+    }
+  }
+
+  // Clears every field of the report card. Called when a new attempt starts so a
+  // re-take can never inherit the score/feedback of the previous attempt.
+  function resetReportView() {
+    if (el.reportScoreNumber) el.reportScoreNumber.textContent = '0 / 8';
+    if (el.reportBadge) {
+      el.reportBadge.className = 'score-badge';
+      el.reportBadge.textContent = '';
+    }
+    if (el.reportSummaryText) el.reportSummaryText.textContent = '';
+    if (el.reportQuestionsList) el.reportQuestionsList.innerHTML = '';
+  }
+
+  // Renders the report area as a loading skeleton while the grader works.
+  function showTestGradingState(isAi) {
+    if (el.testActiveWorkspace) el.testActiveWorkspace.style.display = 'none';
+    if (!el.testReportView) return;
+
+    el.testReportView.style.display = 'block';
+    el.testReportView.classList.add('active');
+
+    if (el.reportScoreNumber) el.reportScoreNumber.textContent = '-- / 8';
+    if (el.reportBadge) {
+      el.reportBadge.className = 'score-badge pending';
+      el.reportBadge.innerHTML = '<span class="ai-loading-spinner"></span> Đang Chấm Điểm...';
+    }
+    if (el.reportSummaryText) {
+      el.reportSummaryText.textContent = isAi
+        ? 'Giám khảo AI đang đọc và chấm từng email theo tiêu chí ETS. Vui lòng chờ trong giây lát...'
+        : 'Hệ thống đang phân tích 2 email theo tiêu chí ETS. Vui lòng chờ trong giây lát...';
+    }
+
+    if (el.reportQuestionsList) {
+      const qCount = (testQuestions && testQuestions.length) || 2;
+      let skeleton = '<div class="report-loading"><div class="ai-loading-spinner report-loading-spinner"></div><span>' +
+        (isAi ? 'Giám khảo AI đang chấm bài...' : 'Đang chấm điểm...') + '</span></div>';
+      for (let i = 0; i < qCount; i++) {
+        skeleton += '<div class="report-skeleton-item">' +
+            '<div class="report-skeleton-line" style="width: 42%;"></div>' +
+            '<div class="report-skeleton-line" style="width: 78%;"></div>' +
+            '<div class="report-skeleton-line" style="width: 64%;"></div>' +
+            '<div class="report-skeleton-line" style="width: 90%;"></div>' +
+          '</div>';
+      }
+      el.reportQuestionsList.innerHTML = skeleton;
+    }
+
+    // Make sure the grading state is actually on screen right away.
+    if (el.testReportView.scrollIntoView) {
+      el.testReportView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
@@ -1092,6 +1166,10 @@
         : 'Đang chấm...';
     }
 
+    // UX FIX: neutralise the feedback card before awaiting, so the result of the
+    // previous grading is not displayed while the new one is being computed.
+    showFeedbackGradingState(isAi);
+
     try {
       let result;
       if (isAi) {
@@ -1121,7 +1199,11 @@
       }
 
       practiceEvaluations[q.id] = result;
-      renderPracticeFeedback(result);
+      // Only paint the feedback if the user is still on this question.
+      const currentQ = questions[practiceActiveIndex];
+      if (currentQ && currentQ.id === q.id) {
+        renderPracticeFeedback(result);
+      }
     } finally {
       if(el.checkAnswerBtn) {
         el.checkAnswerBtn.disabled = false;
@@ -1182,6 +1264,29 @@
         el.feedbackImprovedBox.style.display = 'none';
       }
     }
+  }
+
+  // Puts the instant-feedback card into a "grading" state (and clears the old
+  // verdict) so no stale score is shown while the grader is running.
+  function showFeedbackGradingState(isAi) {
+    if (!el.instantFeedbackBox) return;
+    el.instantFeedbackBox.style.display = 'block';
+
+    if (el.feedbackScoreBadge) {
+      el.feedbackScoreBadge.className = 'score-badge pending';
+      el.feedbackScoreBadge.innerHTML = '<span class="ai-loading-spinner"></span> ' +
+        (isAi ? 'AI đang chấm...' : 'Đang chấm...');
+    }
+    if (el.feedbackLabel) el.feedbackLabel.textContent = '';
+    if (el.feedbackTaskCompletion) el.feedbackTaskCompletion.innerHTML = '';
+    if (el.feedbackCriteria) el.feedbackCriteria.innerHTML = '';
+    if (el.feedbackMessages) el.feedbackMessages.innerHTML = '';
+    if (el.feedbackImprovedBox) {
+      el.feedbackImprovedBox.style.display = 'none';
+      if (el.feedbackImprovedText) el.feedbackImprovedText.innerHTML = '';
+    }
+
+    el.instantFeedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   // --- Initialization ---

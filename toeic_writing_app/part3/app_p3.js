@@ -30,6 +30,11 @@
   let testTimerInterval = null;
   let testIsRunning = false;
   let testIsSubmitted = false;
+  // Grading guards: testGradingRunId invalidates results from a superseded attempt
+  // (so a slow AI answer can never overwrite a newer report), testIsGrading blocks
+  // two grading runs from burning API quota at the same time.
+  let testGradingRunId = 0;
+  let testIsGrading = false;
 
   // Practice state
   let practiceActiveIndex = 0;
@@ -391,6 +396,12 @@
     testQuestion = q;
     testIsSubmitted = false;
 
+    // A brand-new attempt: invalidate any in-flight grading run and wipe the old
+    // report so nothing from the previous essay can flash on screen.
+    testGradingRunId++;
+    testIsGrading = false;
+    resetReportView();
+
     // Reset timer: 30 minutes
     clearInterval(testTimerInterval);
     testTimerSeconds = 30 * 60;
@@ -471,8 +482,15 @@
 
   async function finalizeSubmitTest(force) {
     if (testIsSubmitted && !force) return;
+    // Only one grading run at a time (guards submit click + timer auto-submit).
+    if (testIsGrading) return;
+
+    const runId = ++testGradingRunId;
+    testIsGrading = true;
+
     testIsSubmitted = true;
     clearInterval(testTimerInterval);
+    testTimerInterval = null;
     testIsRunning = false;
     closeModal(el.submitModal);
 
@@ -481,22 +499,86 @@
 
     const btn = el.testSubmitBtn;
     let result;
-    if (isAi) {
-      const orig = btn ? btn.innerHTML : '';
-      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="ai-loading-spinner"></span> Giám khảo AI đang chấm...'; }
-      try {
-        result = await window.ToeicP3LlmEvaluator.evaluate(essay, testQuestion);
-      } catch (err) {
-        console.warn('AI error, fallback offline:', err);
-        result = window.ToeicP3Evaluator.evaluate(essay, testQuestion);
-        if (window.ToeicUi) window.ToeicUi.toast('Giám khảo AI lỗi — dùng bộ chấm Offline.', 'error');
-      }
-      if (btn) { btn.disabled = false; btn.innerHTML = orig; }
-    } else {
-      result = window.ToeicP3Evaluator.evaluate(essay, testQuestion);
-    }
+    try {
+      // UX FIX: show the report area in a "grading in progress" state instead of
+      // the PREVIOUS essay's score. The old report is wiped before the slow AI call.
+      showTestGradingState(isAi);
 
-    renderReport(result, testQuestion);
+      if (isAi) {
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="ai-loading-spinner"></span> Giám khảo AI đang chấm...'; }
+        try {
+          result = await window.ToeicP3LlmEvaluator.evaluate(essay, testQuestion);
+        } catch (err) {
+          console.warn('AI error, fallback offline:', err);
+          result = window.ToeicP3Evaluator.evaluate(essay, testQuestion);
+          if (window.ToeicUi) window.ToeicUi.toast('Giám khảo AI lỗi — dùng bộ chấm Offline.', 'error');
+        }
+        if (btn) { btn.disabled = false; btn.innerHTML = '<span>NỘP BÀI & CHẤM ĐIỂM (Ctrl + Enter)</span>'; }
+      } else {
+        result = window.ToeicP3Evaluator.evaluate(essay, testQuestion);
+      }
+
+      // A newer attempt started while we were grading → drop this stale result.
+      if (runId !== testGradingRunId) return;
+
+      renderReport(result, testQuestion);
+    } finally {
+      if (runId === testGradingRunId) testIsGrading = false;
+    }
+  }
+
+  // Clears every field of the report card so a new attempt can never inherit the
+  // score/feedback of the previous attempt.
+  function resetReportView() {
+    if (el.reportScoreNumber) el.reportScoreNumber.textContent = '0 / 5';
+    if (el.reportBadge) {
+      el.reportBadge.className = 'score-badge';
+      el.reportBadge.textContent = '';
+    }
+    if (el.reportSummaryText) el.reportSummaryText.textContent = '';
+    if (el.reportCriteria) el.reportCriteria.innerHTML = '';
+    if (el.reportMessages) el.reportMessages.innerHTML = '';
+    if (el.reportImprovedBox) {
+      el.reportImprovedBox.style.display = 'none';
+      if (el.reportImprovedText) el.reportImprovedText.innerHTML = '';
+    }
+  }
+
+  // Renders the report area as a loading skeleton while the grader works.
+  function showTestGradingState(isAi) {
+    if (el.testActiveWorkspace) el.testActiveWorkspace.style.display = 'none';
+    if (!el.testReportView) return;
+
+    el.testReportView.style.display = 'block';
+    el.testReportView.classList.add('active');
+
+    if (el.reportScoreNumber) el.reportScoreNumber.textContent = '-- / 5';
+    if (el.reportBadge) {
+      el.reportBadge.className = 'score-badge pending';
+      el.reportBadge.innerHTML = '<span class="ai-loading-spinner"></span> Đang Chấm Điểm...';
+    }
+    if (el.reportSummaryText) {
+      el.reportSummaryText.textContent = isAi
+        ? 'Giám khảo AI đang đọc và chấm bài luận theo tiêu chí ETS. Vui lòng chờ trong giây lát...'
+        : 'Hệ thống đang phân tích bài luận theo tiêu chí ETS. Vui lòng chờ trong giây lát...';
+    }
+    if (el.reportCriteria) {
+      el.reportCriteria.innerHTML = '<div class="report-loading"><div class="ai-loading-spinner report-loading-spinner"></div><span>' +
+        (isAi ? 'Giám khảo AI đang chấm bài...' : 'Đang chấm điểm...') + '</span></div>' +
+        '<div class="report-skeleton-item">' +
+          '<div class="report-skeleton-line" style="width: 42%;"></div>' +
+          '<div class="report-skeleton-line" style="width: 78%;"></div>' +
+          '<div class="report-skeleton-line" style="width: 64%;"></div>' +
+          '<div class="report-skeleton-line" style="width: 90%;"></div>' +
+        '</div>';
+    }
+    if (el.reportMessages) el.reportMessages.innerHTML = '';
+    if (el.reportImprovedBox) el.reportImprovedBox.style.display = 'none';
+
+    // Make sure the grading state is actually on screen right away.
+    if (el.testReportView.scrollIntoView) {
+      el.testReportView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function renderReport(result, q) {
@@ -604,6 +686,10 @@
 
     if (btn) { btn.disabled = true; btn.innerHTML = isAi ? '<span class="ai-loading-spinner"></span> Giám khảo AI đang chấm...' : 'Đang chấm...'; }
 
+    // UX FIX: neutralise the feedback card before awaiting so the previous
+    // verdict is not displayed while the new one is being computed.
+    showFeedbackGradingState(isAi);
+
     let result;
     try {
       if (isAi) {
@@ -632,7 +718,28 @@
       if (btn) { btn.disabled = false; btn.innerHTML = orig; }
     }
 
-    displayFeedback(result, q);
+    // Only paint the feedback if the user is still on this prompt.
+    const currentQ = questions[practiceActiveIndex];
+    if (currentQ && currentQ.id === q.id) {
+      displayFeedback(result, q);
+    }
+  }
+
+  function showFeedbackGradingState(isAi) {
+    if (!el.instantFeedbackBox) return;
+    el.instantFeedbackBox.style.display = 'block';
+
+    if (el.feedbackScoreBadge) {
+      el.feedbackScoreBadge.className = 'score-badge pending';
+      el.feedbackScoreBadge.innerHTML = '<span class="ai-loading-spinner"></span> ' +
+        (isAi ? 'AI đang chấm...' : 'Đang chấm...');
+    }
+    if (el.feedbackLabel) el.feedbackLabel.textContent = '';
+    if (el.feedbackStats) el.feedbackStats.innerHTML = '';
+    if (el.feedbackCriteria) el.feedbackCriteria.innerHTML = '';
+    if (el.feedbackMessages) el.feedbackMessages.innerHTML = '';
+    if (el.feedbackImprovedBox) el.feedbackImprovedBox.style.display = 'none';
+    if (el.feedbackSampleBox) el.feedbackSampleBox.style.display = 'none';
   }
 
   function displayFeedback(result, q) {

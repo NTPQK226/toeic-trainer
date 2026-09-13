@@ -365,6 +365,44 @@ select.custom-select option, .custom-select option { font-weight: 500; color: va
 
 .ai-badge { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #fff; font-size: 0.76rem; padding: 0.18rem 0.5rem; border-radius: var(--radius-sm); font-weight: 700; box-shadow: 0 2px 6px rgba(139,92,246,0.35); }
 
+/* Loading spinner + "grading in progress" states ---------------------------- */
+.ai-loading-spinner {
+  display: inline-block; width: 1.1rem; height: 1.1rem; border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; vertical-align: -3px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Neutral "đang chấm" badge — replaces the old score while grading runs */
+.score-badge.pending { background: var(--bg-main); color: var(--text-muted); border: 1px dashed var(--border-color); }
+
+/* On light surfaces the default white spinner is invisible → tint it */
+.score-badge.pending .ai-loading-spinner,
+.report-loading .ai-loading-spinner {
+  border-color: rgba(99,102,241,0.25); border-top-color: var(--primary);
+}
+
+.report-loading {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 1.25rem;
+  font-weight: 700; font-size: 0.95rem; color: var(--text-muted);
+}
+.report-loading-spinner { width: 1.6rem; height: 1.6rem; border-width: 3px; }
+
+.report-skeleton-item {
+  padding: 1.4rem; background: var(--bg-main); border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 0.7rem;
+}
+.report-skeleton-line {
+  height: 0.85rem; border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--border-color) 50%, var(--bg-subtle) 75%);
+  background-size: 200% 100%; animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-loading-spinner { animation: none; }
+  .report-skeleton-line { animation: none; }
+}
+
 .feedback-stats { margin-bottom: 0.8rem; }
 .feedback-stats-inner {
   display: inline-block; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-full);
