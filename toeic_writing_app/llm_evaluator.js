@@ -210,6 +210,19 @@
 
     const raw = (userSentence || '').trim();
     const requiredKeywords = prompt.keywords || [];
+    // Tokenize once — used below to verify keyword usage deterministically.
+    const tokens = (window.ToeicEvaluator && typeof window.ToeicEvaluator.tokenize === 'function')
+      ? window.ToeicEvaluator.tokenize(raw)
+      : raw.toLowerCase().split(/\s+/).filter(Boolean);
+
+    // Deterministic keyword detection, shared by the prompt (as ground truth) and
+    // by the post-processing below (as the authoritative answer).
+    const kw1Det = requiredKeywords[0]
+      ? window.ToeicEvaluator.checkKeywordMatch(requiredKeywords[0], raw, tokens)
+      : { found: true, matchedWord: '' };
+    const kw2Det = requiredKeywords[1]
+      ? window.ToeicEvaluator.checkKeywordMatch(requiredKeywords[1], raw, tokens)
+      : { found: true, matchedWord: '' };
 
     if (!raw) {
       return {
@@ -274,12 +287,48 @@ CRITICAL ETS / SEC EXAMINER CONSTRAINTS:
 - Avoid starting with vague pronouns ("They/He/She") without naming the subject antecedent first.
 
 2. THE TWO REQUIRED WORDS:
-- Check each word separately and report which form the student actually used (e.g. required "examine" → student wrote "examining" = a valid inflection, therefore counted).
+- A required word counts as USED whenever the sentence contains that word or a valid inflection/derivation of it. Matching is by shared base form, ignoring inflection and plurality.
+  • required "customer" + student wrote "customers"        → USED (plural only, still the same word)
+  • required "choose"   + student wrote "choosing"/"chose" → USED
+  • required "woman"    + student wrote "women"            → USED
+  • required "wait for" + student wrote "waiting for"      → USED
+- Do NOT require the keyword to be inflected exactly as written in the prompt.
+- Do NOT build a grammar complaint out of a keyword's form. In particular, a plural
+  keyword ("customers") or any verb inflection is NOT a grammar error.
+- Do NOT count a DIFFERENT word as satisfying the keyword, even if it is related by
+  meaning or by a shared spelling prefix: "cashier" is not a substitute for
+  "customer", "waitress" is not a substitute for "waiter".
+  IMPORTANT: this only means such a word does not SATISFY the keyword. It is NOT an
+  error in the sentence. If the sentence also contains the required keyword itself
+  elsewhere, both keywords are satisfied and nothing is wrong. Never report an extra,
+  correctly-used noun as a mistake just because it differs from the keyword.
 - Do NOT count a required word that is used in a way unrelated to the picture.
 - A required word placed in a second, extra sentence is NOT a valid use.
+- Report for each keyword which exact form the student used, in keyword1_note/keyword2_note.
 
-3. SUPPLEMENTARY STYLE RULES (app teaching rules — NOT part of the ETS rubric):
-- The task asks for ONE sentence. Treat the FIRST sentence as the scored response; note extra sentences as a style warning rather than an automatic 0.
+4. SCORING CONSISTENCY:
+- If both keywords are present and the sentence is relevant to the picture with no
+  grammar errors, the score MUST be 3. Do not invent a deduction to justify a lower band.
+- To set grammar_passed to false you MUST list at least one concrete error in
+  "grammar_errors", quoting the offending words and giving the correction. If you
+  cannot quote a specific error, set grammar_passed to true.
+- Grammar means MORPHOLOGY and SYNTAX ONLY. Every entry in "grammar_errors" must
+  belong to one of these categories:
+    subject-verb agreement · verb tense · article · preposition · plural/singular ·
+    pronoun · word form (e.g. "informations" → "information") · clause/fragment structure
+- WORD CHOICE IS NOT GRAMMAR. If the sentence is syntactically correct and you merely
+  prefer a different noun or phrase, that is NOT an error — put it in the examiner
+  comment as a vocabulary suggestion and keep grammar_passed true. A sentence like
+  "Some customers are standing near the cashier." is grammatically correct; "cashier"
+  is a normal English word, so it is NOT a grammar error.
+- Do not downgrade for a detail that is not visibly wrong in the picture.
+
+5. SUPPLEMENTARY STYLE RULES (app teaching rules — NOT part of the ETS rubric):
+- The task asks for ONE sentence. Treat the FIRST sentence as the scored response;
+  note extra sentences as a style warning rather than an automatic 0.
+- Starting a sentence with a vague pronoun ("He/She/They") is a style weakness to
+  mention in feedback, but it is NOT one of the three official ETS axes and must not
+  by itself lower the band.
 
 2. MANDATORY "native_upgrade" REWRITE RULES (CRITICAL):
 - In TOEIC Writing Part 1, the single most critical constraint is that the sentence MUST use BOTH given keywords.
@@ -302,6 +351,7 @@ Output strictly valid JSON with no markdown formatting around it:
   "picture_relevance_note": "Bằng tiếng Việt: câu có mô tả ĐÚNG những gì có trong tranh không — nêu rõ chi tiết nào đúng, chi tiết nào không có trong tranh",
   "grammar_passed": true or false,
   "grammar_error_count": <số lỗi ngữ pháp riêng biệt tìm thấy; phải là 0 nếu cho điểm 3>,
+  "grammar_errors": ["lỗi cụ thể kèm cách sửa, ví dụ: \"They is\" -> \"They are\""],
   "grammar_analysis": "Phân tích ngữ pháp tiếng Việt chi tiết theo chuẩn SEC, chỉ rõ chỗ đúng hoặc sai",
   "official_axes": [
     {"name": "Ngữ pháp", "passed": true/false, "detail": "..."},
@@ -322,6 +372,12 @@ Output strictly valid JSON with no markdown formatting around it:
 - Required Keyword 2: "${requiredKeywords[1] || ''}"
 - Reference Sample Answer: "${prompt.sample_answer || ''}"
 - Student's Submission: "${raw}"
+
+AUTOMATED KEYWORD PRE-CHECK (authoritative — do not contradict it):
+- Keyword 1 "${requiredKeywords[0] || ''}": ${kw1Det.found ? `FOUND in the sentence as "${kw1Det.matchedWord}"` : 'NOT FOUND'}
+- Keyword 2 "${requiredKeywords[1] || ''}": ${kw2Det.found ? `FOUND in the sentence as "${kw2Det.matchedWord}"` : 'NOT FOUND'}
+If a keyword is reported FOUND above, you MUST set its *_found field to true and must
+not treat its form as a grammar error. Only judge grammar on real defects.
 
 CRITICAL INSTRUCTION FOR "native_upgrade":
 You MUST include BOTH Required Keyword 1 ("${requiredKeywords[0] || ''}") AND Required Keyword 2 ("${requiredKeywords[1] || ''}") in your "native_upgrade" sentence. Do NOT omit or change either keyword!
@@ -412,12 +468,90 @@ Inspect the attached picture and student submission. Grade strictly according to
     // Map AI result to application format
     const scoreColors = { 3: '#10b981', 2: '#f59e0b', 1: '#ef4444', 0: '#ef4444' };
 
+    // --- Keyword ground truth -------------------------------------------------
+    // Whether a required word is present is a FACT about the text, not a judgement
+    // call. The model was observed marking "customers" as NOT using the keyword
+    // "customer" and then inventing a grammar justification for the deduction.
+    // So we settle it deterministically with our own tokenizer/stemmer and only
+    // fall back to the model's opinion for edge cases we cannot resolve.
+    const kw1 = requiredKeywords[0] || '';
+    const kw2 = requiredKeywords[1] || '';
+
+    // Trust the deterministic result; if it found nothing, accept the model's call
+    // only when it agrees AND reports the word as present (guards against a model
+    // that hallucinates a keyword that was never written).
+    function resolveKeyword(det, aiFound, aiNote, kwText) {
+      if (!kwText) return { found: true, note: 'Không có từ khoá bắt buộc.' };
+      if (det.found) {
+        return {
+          found: true,
+          note: `Sử dụng "${det.matchedWord || kwText}" trong câu (đã đối chiếu tự động theo từ gốc "${kwText}").`
+        };
+      }
+      if (aiFound && new RegExp('\\b' + kwText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(raw)) {
+        return { found: true, note: aiNote || `Sử dụng từ gần nghĩa với "${kwText}".` };
+      }
+      return { found: false, note: aiNote || `Chưa tìm thấy từ khoá "${kwText}" trong câu.` };
+    }
+
+    const kw1Res = resolveKeyword(kw1Det, aiData.keyword1_found, aiData.keyword1_note, kw1);
+    const kw2Res = resolveKeyword(kw2Det, aiData.keyword2_found, aiData.keyword2_note, kw2);
+    const bothKeywordsFound = kw1Res.found && kw2Res.found;
+
+    // If the model falsely claimed a keyword was missing, its grammar verdict is
+    // not trustworthy either — it built that verdict on top of the false premise.
+    // Re-derive "any grammar error" from the offline structural checks instead.
+    const offlineStruct = (function () {
+      try { return window.ToeicEvaluator.analyzeSentenceStructure(raw); }
+      catch (e) { return { issues: [] }; }
+    })();
+    const offlineHardErrors = (offlineStruct.issues || []).filter(i => i.type === 'error');
+    const modelKeyErrorWasWrong = (kw1 && aiData.keyword1_found === false && kw1Det.found) ||
+                                  (kw2 && aiData.keyword2_found === false && kw2Det.found);
+
+    // A grammar failure must be backed by a citable error. If the model claims a
+    // grammar problem but cannot name a single concrete mistake, the claim is not
+    // credible (this is how it previously justified a wrong deduction), so we fall
+    // back to our own structural checks instead of trusting it.
+    const grammarErrors = (Array.isArray(aiData.grammar_errors) ? aiData.grammar_errors : [])
+      .map(e => {
+        if (e && typeof e === 'object') {
+          const err = e.error || e.issue || e.original || e.text || '';
+          const fix = e.correction || e.fix || e.suggestion || '';
+          return fix ? `"${err}" → "${fix}"` : `"${err}"`;
+        }
+        return String(e || '');
+      })
+      .filter(s => s.trim() && s.trim() !== '""');
+
+    // The model sometimes files a pure word-substitution preference as a "grammar
+    // error" (e.g. calling the correct noun "cashier" wrong because the prompt's
+    // keyword was "customer"). Those are vocabulary notes, not grammar defects, and
+    // must not cost a band.
+    //
+    // Whitelist approach: only an entry that names a genuine MORPHOLOGY/SYNTAX
+    // category counts as a grammar error. Anything else (including "X" → "Y"
+    // substitutions) is treated as a vocabulary suggestion, so an unrecognised
+    // complaint can never silently deduct a band.
+    const GRAMMAR_CATEGORY = /agreement|subject-verb|tense|conjugation|participle|infinitive|gerund|article|determiner|preposition|plural|singular|countable|uncountable|pronoun|word form|part of speech|fragment|run-on|comma splice|clause|auxiliary|modal|copula|syntax|word order|subject|object|chia động từ|hòa hợp|hoà hợp|mạo từ|giới từ|số ít|số nhiều|đại từ|dạng từ|trật tự từ|cấu trúc câu|thì của động từ|động từ|danh từ đếm được/i;
+
+    const realGrammarErrors = grammarErrors.filter(e => GRAMMAR_CATEGORY.test(e));
+    const uncitedGrammarClaim = aiData.grammar_passed === false && realGrammarErrors.length === 0;
+
+    const grammarPassed = (modelKeyErrorWasWrong || uncitedGrammarClaim)
+      ? offlineHardErrors.length === 0
+      : aiData.grammar_passed !== false;
+
     const criteria = [
       // The three official ETS axes come first, in the order ETS lists them.
       {
         name: 'Grammar (Ngữ pháp)',
-        passed: !!aiData.grammar_passed,
-        detail: aiData.grammar_analysis || (aiData.grammar_passed ? 'Ngữ pháp chuẩn xác, không có lỗi' : 'Có lỗi sai ngữ pháp — tối đa chỉ đạt Score 2')
+        passed: !!grammarPassed,
+        detail: grammarPassed
+          ? 'Ngữ pháp chuẩn xác, không có lỗi'
+          : (realGrammarErrors.length > 0
+              ? realGrammarErrors.join(' | ')
+              : (aiData.grammar_analysis || 'Có lỗi sai ngữ pháp — tối đa chỉ đạt Score 2'))
       },
       {
         name: 'Relevance to the Picture (Liên quan với tranh)',
@@ -428,8 +562,8 @@ Inspect the attached picture and student submission. Grade strictly according to
       },
       {
         name: 'Use of the Two Required Words (Dùng đủ 2 từ khoá)',
-        passed: !!(aiData.keyword1_found && aiData.keyword2_found),
-        detail: `Từ khoá 1 (${requiredKeywords[0] || ''}): ${aiData.keyword1_found ? 'đã dùng' : 'CHƯA dùng'} — ${aiData.keyword1_note || 'không có ghi chú'}. Từ khoá 2 (${requiredKeywords[1] || ''}): ${aiData.keyword2_found ? 'đã dùng' : 'CHƯA dùng'} — ${aiData.keyword2_note || 'không có ghi chú'}.`
+        passed: bothKeywordsFound,
+        detail: `Từ khoá 1 (${kw1 || ''}): ${kw1Res.found ? 'đã dùng' : 'CHƯA dùng'} — ${kw1Res.note} Từ khoá 2 (${kw2 || ''}): ${kw2Res.found ? 'đã dùng' : 'CHƯA dùng'} — ${kw2Res.note}`
       },
       // App teaching rules (not ETS rubric axes).
       {
@@ -448,11 +582,19 @@ Inspect the attached picture and student submission. Grade strictly according to
 
     // Offline-independent audit: Score 3 is impossible if a required word is missing
     // or the sentence is irrelevant to the picture. Guard against a model that
-    // returns an over-generous band.
+    // returns an over-generous band — now driven by the verified keyword facts.
     let score = [0, 1, 2, 3].includes(aiData.score) ? aiData.score : 0;
-    if (!aiData.keyword1_found || !aiData.keyword2_found) score = Math.min(score, 1);
+    if (!bothKeywordsFound) score = Math.min(score, 1);
     if (aiData.picture_relevance_passed === false) score = Math.min(score, 1);
-    if (aiData.grammar_passed === false && Number(aiData.grammar_error_count) > 0) score = Math.min(score, 2);
+    if (!grammarPassed) score = Math.min(score, 2);
+
+    // Conversely, the rubric mandates Score 3 when all three official axes are clean.
+    // If the model based its lower band on premises we have now disproved (a keyword it
+    // wrongly called missing, or a "grammar error" that was only a word preference),
+    // the score must not be left stranded below what the rubric requires.
+    const relevancePassed = aiData.picture_relevance_passed !== false;
+    const allAxesClean = bothKeywordsFound && relevancePassed && grammarPassed;
+    if (allAxesClean) score = Math.max(score, 3);
 
     const feedback = (aiData.feedback_items && aiData.feedback_items.length > 0)
       ? aiData.feedback_items

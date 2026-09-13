@@ -344,6 +344,20 @@ Return the evaluation in the required JSON format.`;
       const scoreColor = SCORE_COLORS[score] || '#94a3b8';
       const scoreClass = `score-${score}`;
 
+      // The model sometimes returns grammar_errors as objects instead of strings —
+      // flatten them so the UI never prints "[object Object]". Declared here because
+      // both the criteria list below and the feedback messages use it.
+      const grammarErrors = (Array.isArray(aiResult.grammar_errors) ? aiResult.grammar_errors : [])
+        .map(e => {
+          if (e && typeof e === 'object') {
+            const err = e.error || e.issue || e.original || e.text || '';
+            const fix = e.correction || e.fix || e.suggestion || '';
+            return fix ? `"${err}" → "${fix}"` : `"${err}"`;
+          }
+          return String(e || '');
+        })
+        .filter(Boolean);
+
       const aiCriteria = Array.isArray(aiResult.criteria) && aiResult.criteria.length >= 4
         ? aiResult.criteria
         : [
@@ -355,19 +369,6 @@ Return the evaluation in the required JSON format.`;
 
       const messages = [];
       if (aiResult.position_comment) messages.push({ type: aiResult.position_passed ? 'success' : 'warning', text: `Quan điểm: ${aiResult.position_comment}` });
-
-      // The model sometimes returns grammar_errors as objects instead of strings —
-      // flatten them so the UI never prints "[object Object]".
-      const grammarErrors = (Array.isArray(aiResult.grammar_errors) ? aiResult.grammar_errors : [])
-        .map(e => {
-          if (e && typeof e === 'object') {
-            const err = e.error || e.issue || e.original || e.text || '';
-            const fix = e.correction || e.fix || e.suggestion || '';
-            return `"${err}" → "${fix}"`;
-          }
-          return String(e || '');
-        })
-        .filter(Boolean);
 
       // Support analysis — does each reason carry a concrete example/explanation?
       const supportList = Array.isArray(aiResult.support_analysis) ? aiResult.support_analysis : [];
